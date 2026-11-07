@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAFA Clothing - Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-24">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10 px-4 py-3 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-indigo-600">👗 FAFA Clothing</h1>
+        <button onclick="toggleCart()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">
+            🛒 កន្ត្រក (<span id="cart-count">0</span>)
+        </button>
+    </header>
+
+    <!-- Product Grid -->
+    <main class="p-4 max-w-md mx-auto">
+        <h2 class="text-lg font-semibold mb-3">ផលិតផលទាំងអស់</h2>
+        <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
+    </main>
+
+    <!-- Cart & Checkout Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
+        <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
+            <div>
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-lg font-bold">កន្ត្រកទំនិញ</h2>
+                    <button onclick="toggleCart()" class="text-gray-500 font-bold text-xl">&times;</button>
+                </div>
+                
+                <div id="cart-items" class="py-3 space-y-2 border-b max-h-[25vh] overflow-y-auto"></div>
+
+                <!-- Form -->
+                <div class="mt-3 space-y-2">
+                    <h3 class="font-bold text-xs text-indigo-600">ព័ត៌មានអ្នកទទួល</h3>
+                    <input type="text" id="cus-phone" placeholder="លេខទូរសព្ទ (Phone Number)" class="w-full border rounded px-3 py-1.5 text-xs">
+                    <textarea id="cus-address" rows="2" placeholder="ទីតាំងអ្នកទទួល (Address)" class="w-full border rounded px-3 py-1.5 text-xs"></textarea>
+                    
+                    <select id="shipping-option" onchange="updateCartUI()" class="w-full border rounded px-3 py-1.5 text-xs">
+                        <option value="express">ដឹកជញ្ជូនដល់ទីកន្លែង (+ $2.00)</option>
+                        <option value="store">មកយកហាងផ្ទាល់ (ឥតគិតថ្លៃ)</option>
+                    </select>
+
+                    <!-- ABA QR Section -->
+                    <div class="border-t pt-2 mt-2 text-center bg-gray-50 p-2 rounded">
+                        <h4 class="font-bold text-xs text-indigo-600 mb-1">ស្កេនបង់ប្រាក់តាម ABA</h4>
+                        <!-- QR Code បង្ហាញចំនួនទឹកប្រាក់សរុបដាយស្វ័យប្រវត្តិ -->
+                        <img id="aba-qr-img" src="" alt="Dynamic ABA QR" class="w-28 h-28 mx-auto object-cover border rounded mb-1">
+                        <p class="text-[10px] text-gray-600">ចំនួនទឹកប្រាក់ត្រូវបង់: <span id="qr-amount" class="font-bold text-indigo-600">$0.00</span></p>
+                        <p class="text-[10px] text-gray-500">ឈ្មោះ: SRY VANDY | 019 948 707</p>
+                        
+                        <!-- ប៊ូតុងจำลองការបង់ប្រាក់ (សម្រាប់តេស្ត ឬភ្ជាប់ API ធនាគារពិត) -->
+                        <button onclick="simulatePayment()" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold w-full">
+                            ចុចទីនេះក្រោយពេលស្កេនបង់ប្រាក់រួច
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t pt-2 mt-3">
+                <div class="flex justify-between font-bold text-xs mb-2">
+                    <span>សរុបទឹកប្រាក់សរុប:</span>
+                    <span id="total-price" class="text-indigo-600">$0.00</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
+                    បញ្ជាទិញឥឡូវនេះ (Checkout)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const products = [
+            { id: 1, name: "អាវយឺតស្ទីលថ្មី", price: 12.00, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" },
+            { id: 2, name: "ខោខូវប៊យបុរស/នារី", price: 22.00, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" }
+        ];
+
+        let cart = [];
+        let isPaid = false; // ស្ថានភាពនៃការបង់ប្រាក់
+
+        function renderProducts() {
+            document.getElementById('product-grid').innerHTML = products.map(p => `
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden border flex flex-col justify-between">
+                    <img src="${p.image}" class="w-full h-32 object-cover">
+                    <div class="p-2 flex flex-col justify-between flex-grow">
+                        <h3 class="text-xs font-medium">${p.name}</h3>
+                        <p class="text-indigo-600 font-bold text-xs mt-1">$${p.price.toFixed(2)}</p>
+                        <button onclick="addToCart(${p.id})" class="mt-2 bg-indigo-50 text-indigo-600 py-1 rounded text-[10px] font-semibold">បញ្ជូលក្នុងកន្ត្រក</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            let p = products.find(item => item.id === id);
+            let exist = cart.find(item => item.id === id);
+            if (exist) exist.quantity++;
+            else cart.push({ ...p, quantity: 1 });
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.quantity, 0);
+            let container = document.getElementById('cart-items');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center text-xs py-2">កន្ត្រកទទេ</p>';
+                document.getElementById('total-price').innerText = '$0.00';
+                return;
+            }
+
+            container.innerHTML = cart.map(i => `
+                <div class="flex justify-between items-center bg-gray-50 p-1.5 rounded text-xs">
+                    <span>${i.name} ($${i.price}x${i.quantity})</span>
+                    <button onclick="removeItem(${i.id})" class="text-red-500 font-bold">លុប</button>
+                </div>
+            `).join('');
+
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            let shipping = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
+            let total = (subtotal + shipping).toFixed(2);
+
+            document.getElementById('total-price').innerText = `$${total}`;
+            document.getElementById('qr-amount').innerText = `$${total}`;
+
+            // បង្កើត Dynamic QR Code តាមចំនួនទឹកប្រាក់សរុប (ឧទាហរណ៍ប្រើ Bakong KHQR API URL)
+            let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021228220016KHQR@ABAO3600120199487070303USD53038405802KH5909SRY%20VANDY6304...&amount=${total}`;
+            document.getElementById('aba-qr-img').src = qrApiUrl;
+        }
+
+        function removeItem(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-modal').classList.toggle('hidden');
+            updateCartUI();
+        }
+
+        function simulatePayment() {
+            // កន្លែងនេះអាចភ្ជាប់ជាមួយ Webhook ធនាគារពិត ឬបញ្ជាក់ការបង់ប្រាក់
+            isPaid = true;
+            alert('✅ ប្រព័ន្ធបានកត់ត្រាការស្កេនបង់ប្រាក់របស់អ្នករួចរាល់!');
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                alert('សូមជ្រើសរើសទំនិញ!');
+                return;
+            }
+            if (!isPaid) {
+                alert('⚠️ សូមស្កេនបង់ប្រាក់តាម QR Code ជាមុនសិន រួចចុចប៊ូតុងបញ្ជាក់ការបង់ប្រាក់!');
+                return;
+            }
+
+            let phone = document.getElementById('cus-phone').value.trim();
+            let address = document.getElementById('cus-address').value.trim();
+            if (!phone || !address) {
+                alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំងឱ្យបានគ្រប់គ្រាន់!');
+                return;
+            }
+
+            let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
+            let totalAmount = (subtotal + shippingFee).toFixed(2);
+
+            // ផ្ញាទិន្នន័យទៅកាន់ Backend Server
+            try {
+                let response = await fetch('https://fafa-backend.onrender.com/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cart,
+                        phone,
+                        address,
+                        shippingFee,
+                        totalAmount,
+                        paymentStatus: 'PAID'
+                    })
+                });
+
+                let result = await response.json();
+                if (result.success) {
+                    alert('🎉 ការបញ្ជាទិញបានជោគជ័យ និងផ្ញើជូនម្ចាស់ហាងរួចរាល់!');
+                    cart = [];
+                    isPaid = false;
+                    toggleCart();
+                } else {
+                    alert('បរាជ័យ: ' + result.message);
+                }
+            } catch (err) {
+                alert('មានបញ្ហាในการเชื่อมต่อ Server!');
+            }
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
