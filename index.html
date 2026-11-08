@@ -60,49 +60,10 @@
                     <span>សរុបទឹកប្រាក់សរុប:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <button onclick="startCheckoutProcess()" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
-                    បញ្ជាទិញឥឡូវនេះ (Checkout)
+                <!-- 🟢 ចុចទីនេះដើម្បីហៅ Server និង Redirect ไปកាន់ ABA Checkout -->
+                <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
+                    បង់ប្រាក់តាម ABA PayWay
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🟢 POPUP MODAL បង់ប្រាក់ REAL-TIME -->
-    <div id="payment-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-xl p-5 text-center relative shadow-2xl">
-            <button onclick="closePaymentModal()" class="absolute top-2 right-3 text-gray-400 text-2xl font-bold">&times;</button>
-            
-            <div id="payment-step-qr">
-                <h3 class="font-bold text-base text-gray-800">ស្កេនបង់ប្រាក់តាម ABA</h3>
-                <p class="text-xs text-red-500 font-semibold mt-1">រយះពេលបង់ប្រាក់នៅសល់: <span id="timer-display" class="font-bold">60:00</span></p>
-
-                <div class="my-3 bg-gray-50 p-3 rounded-lg border">
-                    <!-- 🟢 កន្លែងបង្ហាញ QR ដែលទាញចេញពី Server / ABA API -->
-                    <div id="qr-container" class="flex justify-center items-center h-40">
-                        <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <p class="text-sm font-bold text-indigo-600 mt-2">ចំនួនទឹកប្រាក់: <span id="pay-amount-display">$0.00</span></p>
-                    <p class="text-xs text-gray-600 mt-0.5">ឈ្មោះ: <strong>SRY VANDY</strong> (500258373)</p>
-                </div>
-
-                <div class="flex items-center justify-center gap-2 text-xs text-gray-500">
-                    <div class="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                    កំពុងរង់ចាំការបង់ប្រាក់ពីធនាគារ...
-                </div>
-            </div>
-
-            <!-- បង្ហាញពេលបង់ប្រាក់ជោគជ័យ -->
-            <div id="payment-step-success" class="hidden py-6">
-                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">✅</div>
-                <h3 class="text-lg font-bold text-green-600">អ្នកបានបង់ប្រាក់ជោគជ័យ!</h3>
-                <p class="text-xs text-gray-500 mt-1">ទិន្នន័យនៃការទិញត្រូវ បានផ្ញើទៅកាន់ម្ចាស់ហាងរួចរាល់។</p>
-            </div>
-
-            <!-- បង្ហាញពេលផុតកំណត់ -->
-            <div id="payment-step-failed" class="hidden py-6">
-                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">❌</div>
-                <h3 class="text-lg font-bold text-red-600">ការទិញរបស់អ្នកបរាជ័យ</h3>
-                <p class="text-xs text-gray-500 mt-1">រយះពេលបង់ប្រាក់ 1 ម៉ោងត្រូវបានផុតកំណត់!</p>
             </div>
         </div>
     </div>
@@ -123,9 +84,6 @@
         ];
 
         let cart = [];
-        let timerInterval = null;
-        let pollInterval = null;
-        let currentOrderId = null;
 
         function renderProducts() {
             document.getElementById('product-grid').innerHTML = products.map(p => `
@@ -188,132 +146,52 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារ Checkout និងទាញយក QR Response មកបង្ហាញ
+        // 🟢 មុខងារ Checkout ផ្ញើទៅ Server ដើម្បីយក Checkout URL មក Redirect ទៅ ABA ផ្ទាល់
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
-            if (!phone || !address) { alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំង!'); return; }
+            if (!phone || !address) { alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំងរបស់អ្នក!'); return; }
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
             let totalAmount = (subtotal + shippingFee).toFixed(2);
+            let orderId = 'FAFA-' + Date.now();
 
-            currentOrderId = 'ORD-' + Date.now();
-            document.getElementById('pay-amount-display').innerText = `$${totalAmount}`;
-            
-            // បង្ហាញ Loading លើ QR container ពេលកំពុងទាញយកទិន្នន័យ
-            document.getElementById('qr-container').innerHTML = `
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-[10px] text-gray-500">កំពុងបង្កើត QR ជាមួយ ABA...</span>
-                </div>
-            `;
-
-            document.getElementById('payment-step-qr').classList.remove('hidden');
-            document.getElementById('payment-step-success').classList.add('hidden');
-            document.getElementById('payment-step-failed').classList.add('hidden');
-            document.getElementById('payment-modal').classList.remove('hidden');
+            let btn = document.getElementById('checkout-btn');
+            btn.innerText = "កំពុងតភ្ជាប់ទៅ ABA...";
+            btn.disabled = true;
 
             try {
                 let response = await fetch('https://fafa-backend.onrender.com/api/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderId: currentOrderId,
+                        orderId,
                         amount: totalAmount,
-                        phone: phone,
-                        address: address,
-                        shippingFee: shippingFee,
-                        cart: cart
+                        phone,
+                        address,
+                        shippingFee,
+                        cart
                     })
                 });
 
                 let result = await response.json();
 
-                if (result.success && result.paywayData) {
-                    // 🟢 ប្រសិនបើ ABA API ឆ្លើយតប QR Image ឬ QR string មក
-                    // (អាស្រ័យលើ Field ដែល ABA PayWay ផ្ញើមក ឧទាហរណ៍: result.paywayData.qr_image ឬ qr_string)
-                    let qrImageSrc = result.paywayData.qr_image || "https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg";
-                    
-                    document.getElementById('qr-container').innerHTML = `
-                        <img src="${qrImageSrc}" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
-                    `;
+                if (result.success && result.checkoutUrl) {
+                    // 🟢 បើកទំព័រទូទាត់របស់ ABA PayWay ភ្លាមៗ (Transaction នឹងលោតចូល Sandbox Dashboard របស់អ្នកភ្លាមៗ)
+                    window.location.href = result.checkoutUrl;
                 } else {
-                    // បើទាញមិនចេញ ប្រើ QR ដើមបណ្តោះអាសន្ន
-                    document.getElementById('qr-container').innerHTML = `
-                        <img src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
-                    `;
+                    alert('បរាជ័យក្នុងការបង្កើតទំព័រទូទាត់!');
+                    btn.innerText = "បង់ប្រាក់តាម ABA PayWay";
+                    btn.disabled = false;
                 }
             } catch (err) {
-                console.log("Create order error:", err);
-                document.getElementById('qr-container').innerHTML = `
-                    <img src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
-                `;
+                console.error(err);
+                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
+                btn.innerText = "បង់ប្រាក់តាម ABA PayWay";
+                btn.disabled = false;
             }
-
-            startTimer(3600);
-            startPaymentPolling(currentOrderId, totalAmount);
-        }
-
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            let timeLeft = seconds;
-            timerInterval = setInterval(() => {
-                let m = Math.floor(timeLeft / 60);
-                let s = timeLeft % 60;
-                document.getElementById('timer-display').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    clearInterval(pollInterval);
-                    document.getElementById('payment-step-qr').classList.add('hidden');
-                    document.getElementById('payment-step-failed').classList.remove('hidden');
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        function startPaymentPolling(orderId, totalAmount) {
-            clearInterval(pollInterval);
-            pollInterval = setInterval(async () => {
-                try {
-                    let response = await fetch('https://fafa-backend.onrender.com/api/check-payment-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ orderId, amount: totalAmount })
-                    });
-                    let res = await response.json();
-
-                    if (res.isPaid) {
-                        clearInterval(pollInterval);
-                        clearInterval(timerInterval);
-
-                        cart.forEach(c => {
-                            let p = products.find(prod => prod.id === c.id);
-                            if (p) p.stock = Math.max(0, p.stock - c.quantity);
-                        });
-
-                        document.getElementById('payment-step-qr').classList.add('hidden');
-                        document.getElementById('payment-step-success').classList.remove('hidden');
-
-                        cart = [];
-                        setTimeout(() => {
-                            closePaymentModal();
-                            toggleCart();
-                            renderProducts();
-                        }, 3000);
-                    }
-                } catch (e) {
-                    console.log("Polling error...", e);
-                }
-            }, 3000);
-        }
-
-        function closePaymentModal() {
-            clearInterval(timerInterval);
-            clearInterval(pollInterval);
-            document.getElementById('payment-modal').classList.add('hidden');
         }
 
         function openImageModal(imgSrc) {
