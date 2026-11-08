@@ -190,7 +190,7 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារចាប់ផ្តើមការ Checkout (បើក Modal បង់ប្រាក់)
+        // 🟢 មុខងារចាប់ផ្តើមការ Checkout (បើក Modal បង់ប្រាក់ និងផ្ញើ Order ទៅ Server)
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -210,11 +210,29 @@
             document.getElementById('payment-step-failed').classList.add('hidden');
             document.getElementById('payment-modal').classList.remove('hidden');
 
+            // 🟢 ផ្ញើសំណើបង្កើត Order ទៅកាន់ Backend Server របស់អ្នក
+            try {
+                await fetch('https://fafa-backend.onrender.com/api/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: currentOrderId,
+                        amount: totalAmount,
+                        phone: phone,
+                        address: address,
+                        shippingFee: shippingFee,
+                        cart: cart
+                    })
+                });
+            } catch (err) {
+                console.log("Create order error:", err);
+            }
+
             // 1. ចាប់ផ្តើមនាឡិការាប់ថយក្រោយ 1 ម៉ោង (3600 វិនាទី)
             startTimer(3600);
 
             // 2. ចាប់ផ្តើមសួរទៅកាន់ Backend Server ដើម្បីដឹងថាអតិថិជនបង់លុយពិតប្រាកដ ឬនៅ (Real-time Polling)
-            startPaymentPolling(currentOrderId, totalAmount, phone, address, shippingFee);
+            startPaymentPolling(currentOrderId, totalAmount);
         }
 
         function startTimer(seconds) {
@@ -237,7 +255,7 @@
         }
 
         // 🟢 មុខងារត្រួតពិនិត្យការបង់ប្រាក់ Real-time ជាមួយ Backend
-        function startPaymentPolling(orderId, totalAmount, phone, address, shippingFee) {
+        function startPaymentPolling(orderId, totalAmount) {
             clearInterval(pollInterval);
             pollInterval = setInterval(async () => {
                 try {
@@ -284,7 +302,16 @@
             document.getElementById('payment-modal').classList.add('hidden');
         }
 
+        function openImageModal(imgSrc) {
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
         renderProducts();
     </script>
 </body>
-</html> 
+</html>
