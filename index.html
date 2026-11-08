@@ -146,8 +146,8 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារ Checkout បង្កើត Form POST បញ្ជូនទៅ ABA PayWay ຢ່າງត្រឹមត្រូវ
-        async function startCheckoutProcess() {
+        // 🟢 មុខងារ Checkout ផ្ញើ Form ផ្ទាល់ទៅ Backend Render ដើម្បីឱ្យវា Auto-Submit ទៅ ABA PayWay
+        function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
@@ -162,58 +162,30 @@
             btn.innerText = "កំពុងតភ្ជាប់ទៅ ABA...";
             btn.disabled = true;
 
-            try {
-                let response = await fetch('https://fafa-backend.onrender.com/api/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId,
-                        amount: totalAmount,
-                        phone,
-                        address,
-                        shippingFee,
-                        cart
-                    })
-                });
+            // สร้าง Form POST ไปยัง Render Backend ໂດຍตรง
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://fafa-backend.onrender.com/api/create-order';
 
-                let result = await response.json();
+            let fields = {
+                orderId: orderId,
+                amount: totalAmount,
+                phone: phone,
+                address: address,
+                shippingFee: shippingFee,
+                cart: JSON.stringify(cart)
+            };
 
-                if (result.success) {
-                    let form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = result.actionUrl;
-
-                    // 🟢 បន្ថែម items ចូលទៅជាមួយឱ្យត្រូវគ្នាទាំងស្រុង
-                    let fields = {
-                        merchant_id: result.merchant_id,
-                        req_time: result.req_time,
-                        tran_id: result.tran_id,
-                        amount: result.amount,
-                        items: result.items, // 👈 ដាក់បន្ថែមត្រង់នេះ
-                        hash: result.hash
-                    };
-
-                    for (let key in fields) {
-                        let input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = fields[key];
-                        form.appendChild(input);
-                    }
-
-                    document.body.appendChild(form);
-                    form.submit(); 
-                } else {
-                    alert('បរាជ័យក្នុងការបង្កើតទំព័រទូទាត់!');
-                    btn.innerText = "បង់ប្រាក់តាម ABA PayWay";
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                console.error(err);
-                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
-                btn.innerText = "បង់ប្រាក់តាម ABA PayWay";
-                btn.disabled = false;
+            for (let key in fields) {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
             }
+
+            document.body.appendChild(form);
+            form.submit(); // ส่งข้อมูลទៅ Render Backend ໂດຍស្វ័យប្រវត្តិ
         }
 
         function openImageModal(imgSrc) {
