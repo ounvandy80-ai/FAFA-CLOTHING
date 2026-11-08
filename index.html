@@ -186,8 +186,8 @@
             let qrApiUrl = `https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg`;
             document.getElementById('aba-qr-img').src = qrApiUrl;
 
-            // 🟢 ប្រើប្រាស់ ABA App Deep Link ផ្លូវការជាមួយលេខគណនី និងចំនួនទឹកប្រាក់
-            let abaDeepLink = `abamobile://pay?r=500258373&amount=${total}&currency=USD&note=FAFA%20Clothing`;
+            // 🟢 ប្រើប្រាស់ ABA Deep Link តាមរយៈទម្រង់ Web Intent (Telegram អនុញ្ញាតឱ្យបើក)
+            let abaDeepLink = `https://pay.ababank.com/pay?amount=${total}&to=500258373&name=SRY%20VANDY&note=FAFA%20Clothing`;
             document.getElementById('aba-app-link').href = abaDeepLink;
         }
 
