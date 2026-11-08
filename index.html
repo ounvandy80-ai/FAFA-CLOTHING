@@ -186,9 +186,8 @@
             let qrApiUrl = `https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg`;
             document.getElementById('aba-qr-img').src = qrApiUrl;
 
-            // 🟢 ABA PayWay / Bakong KHQR Universal Link សម្រាប់បើកចូល App ABA ជាមួយតម្លៃសរុបស្រាប់
-            // Link នេះប្រើទម្រង់ aba PAYWAY Intent scheme ធានាថានៅពេលបើកលើទូរស័ព្ទដៃ App ABA នឹងលោតទារប្រាក់តាមចំនួនទឹកប្រាក់នេះស្រាប់
-            let abaDeepLink = `https://checkout.payway.com.kh/pay?id=500258373&amount=${total}`;
+            // 🟢 ប្រើប្រាស់ ABA App Deep Link ផ្លូវការជាមួយលេខគណនី និងចំនួនទឹកប្រាក់
+            let abaDeepLink = `abamobile://pay?r=500258373&amount=${total}&currency=USD&note=FAFA%20Clothing`;
             document.getElementById('aba-app-link').href = abaDeepLink;
         }
 
