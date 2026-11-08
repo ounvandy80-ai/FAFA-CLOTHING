@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <!-- Cart Modal (គ្មាន QR Code ទៀតទេ) -->
+    <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
             <div>
@@ -60,7 +60,6 @@
                     <span>សរុបទឹកប្រាក់សរុប:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <!-- ចុច Checkout ដើម្បីទៅបើក Modal បង់ប្រាក់ -->
                 <button onclick="startCheckoutProcess()" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
                     បញ្ជាទិញឥឡូវនេះ (Checkout)
                 </button>
@@ -68,7 +67,7 @@
         </div>
     </div>
 
-    <!-- 🟢 POPUP MODAL បង់ប្រាក់ REAL-TIME + COUNTDOWN 1 ម៉ោង -->
+    <!-- 🟢 POPUP MODAL បង់ប្រាក់ REAL-TIME -->
     <div id="payment-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-xl p-5 text-center relative shadow-2xl">
             <button onclick="closePaymentModal()" class="absolute top-2 right-3 text-gray-400 text-2xl font-bold">&times;</button>
@@ -78,7 +77,10 @@
                 <p class="text-xs text-red-500 font-semibold mt-1">រយះពេលបង់ប្រាក់នៅសល់: <span id="timer-display" class="font-bold">60:00</span></p>
 
                 <div class="my-3 bg-gray-50 p-3 rounded-lg border">
-                    <img id="checkout-qr-img" src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
+                    <!-- 🟢 កន្លែងបង្ហាញ QR ដែលទាញចេញពី Server / ABA API -->
+                    <div id="qr-container" class="flex justify-center items-center h-40">
+                        <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
                     <p class="text-sm font-bold text-indigo-600 mt-2">ចំនួនទឹកប្រាក់: <span id="pay-amount-display">$0.00</span></p>
                     <p class="text-xs text-gray-600 mt-0.5">ឈ្មោះ: <strong>SRY VANDY</strong> (500258373)</p>
                 </div>
@@ -89,20 +91,16 @@
                 </div>
             </div>
 
-            <!-- 🟢 បង្ហាញពេលបង់ប្រាក់ជោគជ័យ -->
+            <!-- បង្ហាញពេលបង់ប្រាក់ជោគជ័យ -->
             <div id="payment-step-success" class="hidden py-6">
-                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">
-                    ✅
-                </div>
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">✅</div>
                 <h3 class="text-lg font-bold text-green-600">អ្នកបានបង់ប្រាក់ជោគជ័យ!</h3>
                 <p class="text-xs text-gray-500 mt-1">ទិន្នន័យនៃការទិញត្រូវ បានផ្ញើទៅកាន់ម្ចាស់ហាងរួចរាល់។</p>
             </div>
 
-            <!-- 🔴 បង្ហាញពេលផុតកំណត់ 1 ម៉ោង (បរាជ័យ) -->
+            <!-- បង្ហាញពេលផុតកំណត់ -->
             <div id="payment-step-failed" class="hidden py-6">
-                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">
-                    ❌
-                </div>
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">❌</div>
                 <h3 class="text-lg font-bold text-red-600">ការទិញរបស់អ្នកបរាជ័យ</h3>
                 <p class="text-xs text-gray-500 mt-1">រយះពេលបង់ប្រាក់ 1 ម៉ោងត្រូវបានផុតកំណត់!</p>
             </div>
@@ -190,7 +188,7 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារចាប់ផ្តើមការ Checkout (បើក Modal បង់ប្រាក់ និងផ្ញើ Order ទៅ Server)
+        // 🟢 មុខងារ Checkout និងទាញយក QR Response មកបង្ហាញ
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -204,15 +202,21 @@
             currentOrderId = 'ORD-' + Date.now();
             document.getElementById('pay-amount-display').innerText = `$${totalAmount}`;
             
-            // បើក Modal QR
+            // បង្ហាញ Loading លើ QR container ពេលកំពុងទាញយកទិន្នន័យ
+            document.getElementById('qr-container').innerHTML = `
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-[10px] text-gray-500">កំពុងបង្កើត QR ជាមួយ ABA...</span>
+                </div>
+            `;
+
             document.getElementById('payment-step-qr').classList.remove('hidden');
             document.getElementById('payment-step-success').classList.add('hidden');
             document.getElementById('payment-step-failed').classList.add('hidden');
             document.getElementById('payment-modal').classList.remove('hidden');
 
-            // 🟢 ផ្ញើសំណើបង្កើត Order ទៅកាន់ Backend Server របស់អ្នក
             try {
-                await fetch('https://fafa-backend.onrender.com/api/create-order', {
+                let response = await fetch('https://fafa-backend.onrender.com/api/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -224,14 +228,31 @@
                         cart: cart
                     })
                 });
+
+                let result = await response.json();
+
+                if (result.success && result.paywayData) {
+                    // 🟢 ប្រសិនបើ ABA API ឆ្លើយតប QR Image ឬ QR string មក
+                    // (អាស្រ័យលើ Field ដែល ABA PayWay ផ្ញើមក ឧទាហរណ៍: result.paywayData.qr_image ឬ qr_string)
+                    let qrImageSrc = result.paywayData.qr_image || "https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg";
+                    
+                    document.getElementById('qr-container').innerHTML = `
+                        <img src="${qrImageSrc}" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
+                    `;
+                } else {
+                    // បើទាញមិនចេញ ប្រើ QR ដើមបណ្តោះអាសន្ន
+                    document.getElementById('qr-container').innerHTML = `
+                        <img src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
+                    `;
+                }
             } catch (err) {
                 console.log("Create order error:", err);
+                document.getElementById('qr-container').innerHTML = `
+                    <img src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
+                `;
             }
 
-            // 1. ចាប់ផ្តើមនាឡិការាប់ថយក្រោយ 1 ម៉ោង (3600 វិនាទី)
             startTimer(3600);
-
-            // 2. ចាប់ផ្តើមសួរទៅកាន់ Backend Server ដើម្បីដឹងថាអតិថិជនបង់លុយពិតប្រាកដ ឬនៅ (Real-time Polling)
             startPaymentPolling(currentOrderId, totalAmount);
         }
 
@@ -246,7 +267,6 @@
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     clearInterval(pollInterval);
-                    // ផុតកំណត់ ១ ម៉ោង -> បង្ហាញបរាជ័យ
                     document.getElementById('payment-step-qr').classList.add('hidden');
                     document.getElementById('payment-step-failed').classList.remove('hidden');
                 }
@@ -254,12 +274,10 @@
             }, 1000);
         }
 
-        // 🟢 មុខងារត្រួតពិនិត្យការបង់ប្រាក់ Real-time ជាមួយ Backend
         function startPaymentPolling(orderId, totalAmount) {
             clearInterval(pollInterval);
             pollInterval = setInterval(async () => {
                 try {
-                    // ផ្ញើសំណើទៅ Server ដើម្បី check ការបង់ប្រាក់
                     let response = await fetch('https://fafa-backend.onrender.com/api/check-payment-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -267,22 +285,18 @@
                     });
                     let res = await response.json();
 
-                    // ប្រសិនបើ Server បញ្ជាក់ថា "បង់ប្រាក់ពិតប្រាកដរួចរាល់"
                     if (res.isPaid) {
                         clearInterval(pollInterval);
                         clearInterval(timerInterval);
 
-                        // កាត់ស្តុក
                         cart.forEach(c => {
                             let p = products.find(prod => prod.id === c.id);
                             if (p) p.stock = Math.max(0, p.stock - c.quantity);
                         });
 
-                        // ប្តូរអេក្រង់ទៅជា សញ្ញាគ្រីស ✅
                         document.getElementById('payment-step-qr').classList.add('hidden');
                         document.getElementById('payment-step-success').classList.remove('hidden');
 
-                        // លុបកន្ត្រក និង Refresh
                         cart = [];
                         setTimeout(() => {
                             closePaymentModal();
@@ -293,7 +307,7 @@
                 } catch (e) {
                     console.log("Polling error...", e);
                 }
-            }, 3000); // ឆែកមើលរៀងរាល់ ៣ វិនាទីម្តង
+            }, 3000);
         }
 
         function closePaymentModal() {
