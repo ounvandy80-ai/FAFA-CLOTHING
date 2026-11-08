@@ -146,7 +146,7 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារ Checkout បង្កើត Form POST បញ្ជូនទៅ ABA PayWay ຢ່າງຖືກត្រូវ
+        // 🟢 មុខងារ Checkout បង្កើត Form POST បញ្ជូនទៅ ABA PayWay ຢ່າງត្រឹមត្រូវ
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -183,11 +183,13 @@
                     form.method = 'POST';
                     form.action = result.actionUrl;
 
+                    // 🟢 បន្ថែម items ចូលទៅជាមួយឱ្យត្រូវគ្នាទាំងស្រុង
                     let fields = {
                         merchant_id: result.merchant_id,
                         req_time: result.req_time,
                         tran_id: result.tran_id,
                         amount: result.amount,
+                        items: result.items, // 👈 ដាក់បន្ថែមត្រង់នេះ
                         hash: result.hash
                     };
 
