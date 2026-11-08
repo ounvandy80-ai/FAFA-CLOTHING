@@ -31,6 +31,24 @@
         </div>
     </div>
 
+    <!-- QR Code Payment Modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xs p-5 rounded-xl shadow-2xl text-center flex flex-col items-center">
+            <h3 class="text-base font-bold text-indigo-600 mb-1">ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
+            <p class="text-xs text-gray-500 mb-3">សូមប្រើប្រាស់ ABA Mobile ដើម្បីស្កេន QR ខាងក្រោម</p>
+            
+            <div id="qr-container" class="bg-gray-100 p-2 rounded-lg border mb-3 w-48 h-48 flex items-center justify-center">
+                <span class="text-xs text-gray-400" id="qr-loading">កំពុងបង្កើត QR Code...</span>
+            </div>
+
+            <p class="text-xs font-semibold mb-4">ទឹកប្រាក់សរុប: <span id="qr-amount" class="text-indigo-600 font-bold"></span></p>
+
+            <button onclick="closeQrModal()" class="w-full bg-gray-300 text-gray-700 py-2 rounded-lg font-semibold text-xs hover:bg-gray-400">
+                បោះបង់ / បិទ
+            </button>
+        </div>
+    </div>
+
     <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
@@ -60,9 +78,8 @@
                     <span>សរុបទឹកប្រាក់សរុប:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <!-- ចុចទីនេះដើម្បីហៅ Server និង POST ไปកាន់ ABA Checkout -->
                 <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
-                    បង់ប្រាក់តាម ABA PayWay
+                    បង់ប្រាក់តាម ABA PayWay (QR)
                 </button>
             </div>
         </div>
@@ -146,8 +163,8 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារ Checkout ផ្ញើ Form ផ្ទាល់ទៅ Backend Render ដើម្បីឱ្យវា Auto-Submit ទៅ ABA PayWay
-        function startCheckoutProcess() {
+        // 🟢 មុខងារហៅ API យក QR Code មកបង្ហាញក្នុង Modal លើ Mini App
+        async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
@@ -159,33 +176,49 @@
             let orderId = 'FAFA-' + Date.now();
 
             let btn = document.getElementById('checkout-btn');
-            btn.innerText = "កំពុងតភ្ជាប់ទៅ ABA...";
+            btn.innerText = "កំពុងបង្កើត QR Code...";
             btn.disabled = true;
 
-            // สร้าง Form POST ไปยัง Render Backend ໂດຍตรง
-            let form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://fafa-backend.onrender.com/api/create-order';
+            try {
+                let response = await fetch('https://fafa-backend.onrender.com/api/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId,
+                        amount: totalAmount,
+                        phone,
+                        address,
+                        shippingFee,
+                        cart
+                    })
+                });
 
-            let fields = {
-                orderId: orderId,
-                amount: totalAmount,
-                phone: phone,
-                address: address,
-                shippingFee: shippingFee,
-                cart: JSON.stringify(cart)
-            };
+                let result = await response.json();
 
-            for (let key in fields) {
-                let input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = fields[key];
-                form.appendChild(input);
+                if (result.success) {
+                    // បង្ហាញ QR Modal
+                    document.getElementById('qr-amount').innerText = `$${totalAmount}`;
+                    let qrContainer = document.getElementById('qr-container');
+                    
+                    // បញ្ចូលរូបភាព QR Code (Base64) មកបង្ហាញ
+                    qrContainer.innerHTML = `<img src="data:image/png;base64,${result.qrImage}" class="w-full h-full object-contain rounded" alt="ABA QR Code">`;
+                    
+                    document.getElementById('qr-modal').classList.remove('hidden');
+                    toggleCart(); // បិទកន្ត្រក
+                } else {
+                    alert('បរាជ័យក្នុងការបង្កើត QR Code: ' + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
+            } finally {
+                btn.innerText = "បង់ប្រាក់តាម ABA PayWay (QR)";
+                btn.disabled = false;
             }
+        }
 
-            document.body.appendChild(form);
-            form.submit(); // ส่งข้อมูลទៅ Render Backend ໂດຍស្វ័យប្រវត្តិ
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
         }
 
         function openImageModal(imgSrc) {
