@@ -60,7 +60,7 @@
                     <span>សរុបទឹកប្រាក់សរុប:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <!-- 🟢 ចុចទីនេះដើម្បីហៅ Server និង Redirect ไปកាន់ ABA Checkout -->
+                <!-- ចុចទីនេះដើម្បីហៅ Server និង POST ไปកាន់ ABA Checkout -->
                 <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
                     បង់ប្រាក់តាម ABA PayWay
                 </button>
@@ -146,7 +146,7 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារ Checkout ផ្ញើទៅ Server ដើម្បីយក Checkout URL មក Redirect ទៅ ABA ផ្ទាល់
+        // 🟢 មុខងារ Checkout បង្កើត Form POST បញ្ជូនទៅ ABA PayWay ຢ່າງຖືກត្រូវ
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -178,9 +178,29 @@
 
                 let result = await response.json();
 
-                if (result.success && result.checkoutUrl) {
-                    // 🟢 បើកទំព័រទូទាត់របស់ ABA PayWay ភ្លាមៗ (Transaction នឹងលោតចូល Sandbox Dashboard របស់អ្នកភ្លាមៗ)
-                    window.location.href = result.checkoutUrl;
+                if (result.success) {
+                    let form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = result.actionUrl;
+
+                    let fields = {
+                        merchant_id: result.merchant_id,
+                        req_time: result.req_time,
+                        tran_id: result.tran_id,
+                        amount: result.amount,
+                        hash: result.hash
+                    };
+
+                    for (let key in fields) {
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = fields[key];
+                        form.appendChild(input);
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit(); 
                 } else {
                     alert('បរាជ័យក្នុងការបង្កើតទំព័រទូទាត់!');
                     btn.innerText = "បង់ប្រាក់តាម ABA PayWay";
