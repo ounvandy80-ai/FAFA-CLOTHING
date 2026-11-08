@@ -20,7 +20,9 @@
     <!-- Product Grid -->
     <main class="p-4 max-w-md mx-auto">
         <h2 class="text-lg font-semibold mb-3">ផលិតផលទាំងអស់</h2>
-        <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
+        <div id="product-grid" class="grid grid-cols-2 gap-4">
+            <p class="text-xs text-gray-400 col-span-2 text-center py-4">កំពុងទាញយកទំនិញ...</p>
+        </div>
     </main>
 
     <!-- Modal រូបភាពធំ -->
@@ -93,19 +95,20 @@
         tg.expand();
 
         let currentTranId = null;
-
-        const products = [
-            { id: 1, name: "អាវយឺត FREE SIZE", price: 0.05, stock: 5, image: "https://i.postimg.cc/0NrGyrGt/858535232-122143330293104345-8003998162307616562-n.jpg" },
-            { id: 2, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 3, image: "https://i.postimg.cc/HkY4F6rY/858998600-122143328523104345-9154920380344446311-n.jpg" },
-            { id: 3, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 2, image: "https://i.postimg.cc/T1R3T7By/859090829-122143330215104345-4641336911256672944-n.jpg" },
-            { id: 4, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 4, image: "https://i.postimg.cc/k4CnyYJL/859396177-122143328499104345-4898313489564552661-n.jpg" },
-            { id: 5, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 1, image: "https://i.postimg.cc/kG1qqnQn/859396179-122143328535104345-7526329722242687048-n.jpg" },
-            { id: 6, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 6, image: "https://i.postimg.cc/sXKR4V0f/859784793-122143328547104345-5525957976114747478-n.jpg" },
-            { id: 7, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/brJf6KKV/859980286-122143330197104345-5978106523108566575-n.jpg" },
-            { id: 8, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/XqzStsWV/863325406-122143330281104345-4670333600097983632-n.jpg" }
-        ];
-
+        let products = [];
         let cart = [];
+
+        // 🟢 ទាញយកទិន្នន័យផលិតផលពី Server ពេលចាប់ផ្តើម
+        async function fetchProducts() {
+            try {
+                let response = await fetch('https://fafa-backend.onrender.com/api/products');
+                products = await response.json();
+                renderProducts();
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                document.getElementById('product-grid').innerHTML = '<p class="text-xs text-red-500 col-span-2 text-center">បរាជ័យក្នុងការទាញយកទំនិញពី Server</p>';
+            }
+        }
 
         function renderProducts() {
             document.getElementById('product-grid').innerHTML = products.map(p => `
@@ -202,7 +205,6 @@
                 if (result.success) {
                     currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
-                    
                     document.getElementById('qr-image-tag').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ABA_SRY_VANDY_500258373_USD_${totalAmount}`;
 
                     document.getElementById('qr-modal').classList.remove('hidden');
@@ -219,7 +221,7 @@
             }
         }
 
-        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួច កាត់ស្តុក និងផ្ញើសារចូល Telegram
+        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួច Server ធ្វើការកាត់ស្តុកជាអចិន្ត្រៃយ៍
         async function confirmPayment() {
             let btn = document.getElementById('confirm-pay-btn');
             btn.innerText = "កំពុងបញ្ជូនព័ត៌មាន...";
@@ -234,18 +236,11 @@
 
                 let result = await response.json();
                 if (result.success) {
-                    // 🟢 កាត់បន្ថយស្តុករបស់ផលិតផលក្នុង Frontend តាមចំនួនដែលបានទិញជាក់ស្តែង
-                    cart.forEach(cartItem => {
-                        let product = products.find(p => p.id === cartItem.id);
-                        if (product) {
-                            product.stock = Math.max(0, product.stock - cartItem.quantity);
-                        }
-                    });
+                    products = result.products; // ទទួលបានស្តុកចុងក្រោយពី Server
+                    renderProducts(); // Render ឡើងវិញ
+                    cart = []; // សម្អាតកន្ត្រក
 
-                    renderProducts(); // 🔄 Render បង្ហាញស្តុកថ្មីនៅលើអេក្រង់ភ្លាមៗ
-                    cart = []; // សម្អាតកន្ត្រកទំនិញ
-
-                    alert('🎉 ការបញ្ជាទិញជោគជ័យ! ស្តុកត្រូវបានកាត់បន្ថយ និងទិន្នន័យត្រូវបានផ្ញើជូនម្ចាស់ហាងរួចរាល់។');
+                    alert('🎉 ការបញ្ជាទិញជោគជ័យ! ស្តុកត្រូវបានកាត់បន្ថយលើប្រព័ន្ធ Server រួចរាល់។');
                     
                     closeQrModal();
                     updateCartUI();
@@ -275,7 +270,8 @@
             document.getElementById('image-modal').classList.add('hidden');
         }
 
-        renderProducts();
+        // ចាប់ផ្តើមទាញយកទំនិញពេលចូលវេបសាយ
+        fetchProducts();
     </script>
 </body>
 </html>
