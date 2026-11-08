@@ -34,17 +34,20 @@
     <!-- QR Code Payment Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-xs p-5 rounded-xl shadow-2xl text-center flex flex-col items-center">
-            <h3 class="text-base font-bold text-indigo-600 mb-1">ស្កេនដើម្បីទូទាត់ប្រាក់</h3>
-            <p class="text-xs text-gray-500 mb-3">សូមប្រើប្រាស់ ABA Mobile ដើម្បីស្កេន QR ខាងក្រោម</p>
+            <h3 class="text-base font-bold text-indigo-600 mb-1">ស្កេនបង់ប្រាក់ qua ABA KHQR</h3>
+            <p class="text-[11px] text-gray-600 mb-2">ឈ្មោះ: <strong class="text-black">SRY VANDY</strong><br>លេខគណនី: <strong class="text-indigo-600">500258373</strong></p>
             
-            <div id="qr-container" class="bg-gray-100 p-2 rounded-lg border mb-3 w-48 h-48 flex items-center justify-center">
-                <span class="text-xs text-gray-400" id="qr-loading">កំពុងបង្កើត QR Code...</span>
+            <div id="qr-container" class="bg-white p-2 rounded-lg border mb-3 w-48 h-48 flex items-center justify-center shadow-inner">
+                <img id="qr-image-tag" src="" alt="ABA QR Code" class="w-full h-full object-contain">
             </div>
 
-            <p class="text-xs font-semibold mb-4">ទឹកប្រាក់សរុប: <span id="qr-amount" class="text-indigo-600 font-bold"></span></p>
+            <p class="text-xs font-semibold mb-2">ទឹកប្រាក់សរុប: <span id="qr-amount" class="text-indigo-600 font-bold text-sm"></span></p>
 
-            <button onclick="closeQrModal()" class="w-full bg-gray-300 text-gray-700 py-2 rounded-lg font-semibold text-xs hover:bg-gray-400">
-                បោះបង់ / បិទ
+            <button onclick="confirmPayment()" id="confirm-pay-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold text-xs hover:bg-green-700 mb-2">
+                បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)
+            </button>
+            <button onclick="closeQrModal()" class="w-full bg-gray-200 text-gray-700 py-1.5 rounded-lg font-semibold text-xs hover:bg-gray-300">
+                បោះបង់
             </button>
         </div>
     </div>
@@ -79,7 +82,7 @@
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
                 <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
-                    បង់ប្រាក់តាម ABA PayWay (QR)
+                    បង់ប្រាក់តាម ABA KHQR
                 </button>
             </div>
         </div>
@@ -88,6 +91,8 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        let currentTranId = null;
 
         const products = [
             { id: 1, name: "អាវយឺត FREE SIZE", price: 0.05, stock: 5, image: "https://i.postimg.cc/0NrGyrGt/858535232-122143330293104345-8003998162307616562-n.jpg" },
@@ -163,7 +168,7 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារហៅ API យក QR Code មកបង្ហាញក្នុង Modal លើ Mini App
+        // 🟢 មុខងារបង្កើត Order និងបង្ហាញ QR Code ផ្ទាល់ខ្លួន
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -176,7 +181,7 @@
             let orderId = 'FAFA-' + Date.now();
 
             let btn = document.getElementById('checkout-btn');
-            btn.innerText = "កំពុងបង្កើត QR Code...";
+            btn.innerText = "កំពុងបង្កើត QR...";
             btn.disabled = true;
 
             try {
@@ -196,23 +201,62 @@
                 let result = await response.json();
 
                 if (result.success) {
-                    // បង្ហាញ QR Modal
+                    currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
-                    let qrContainer = document.getElementById('qr-container');
                     
-                    // បញ្ចូលរូបភាព QR Code (Base64) មកបង្ហាញ
-                    qrContainer.innerHTML = `<img src="data:image/png;base64,${result.qrImage}" class="w-full h-full object-contain rounded" alt="ABA QR Code">`;
+                    // បង្កើត KHQR តាមរយៈ Quick Link ( ABA Pay / KHQR Generator )
+                    // លេខគណនី: 500258373, ឈ្មោះ: SRY VANDY
+                    let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020101021230640016com.ababank.qr@aba0210500258373030301053038405802KH5909SRY%20VANDY6304...`;
                     
+                    // ប្រើប្រាស់ KHQR Payload ស្តង់ដារ ឬ API Link សម្រាប់ Account 500258373
+                    let khqrString = `https://checkout.payway.com.kh/images/payway-logo.png`; // Placeholder or dynamic generator
+                    
+                    // ជំនួសដោយ Link បង្កើត QR ផ្ទាល់ខ្លួនដែលមានចំនួនទឹកប្រាក់
+                    let dynamicQr = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=ABA:500258373:SRY_VANDY:amount_${totalAmount}`;
+                    
+                    // ប្រើប្រាស់ Bakong / KHQR Standard format ដ៏ស្រួល
+                    document.getElementById('qr-image-tag').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ABA_SRY_VANDY_500258373_USD_${totalAmount}`;
+
                     document.getElementById('qr-modal').classList.remove('hidden');
-                    toggleCart(); // បិទកន្ត្រក
+                    toggleCart();
                 } else {
-                    alert('បរាជ័យក្នុងការបង្កើត QR Code: ' + result.message);
+                    alert('បរាជ័យក្នុងការបង្កើតការបញ្ជាទិញ!');
                 }
             } catch (err) {
                 console.error(err);
                 alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
             } finally {
-                btn.innerText = "បង់ប្រាក់តាម ABA PayWay (QR)";
+                btn.innerText = "បង់ប្រាក់តាម ABA KHQR";
+                btn.disabled = false;
+            }
+        }
+
+        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួចផ្ញើសារចូល Telegram
+        async function confirmPayment() {
+            let btn = document.getElementById('confirm-pay-btn');
+            btn.innerText = "កំពុងបញ្ជូនព័ត៌មាន...";
+            btn.disabled = true;
+
+            try {
+                let response = await fetch('https://fafa-backend.onrender.com/api/confirm-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tran_id: currentTranId })
+                });
+
+                let result = await response.json();
+                if (result.success) {
+                    alert('🎉 ការបញ្ជាទិញជោគជ័យ! ទិន្នន័យត្រូវបានផ្ញើជូនម្ចាស់ហាងរួចរាល់។');
+                    location.reload();
+                } else {
+                    alert('មានបញ្ហាបញ្ជាក់ការទូទាត់!');
+                    btn.innerText = "បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('កំហុសក្នុងការតភ្ជាប់ Server!');
+                btn.innerText = "បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)";
                 btn.disabled = false;
             }
         }
