@@ -168,7 +168,6 @@
             updateCartUI();
         }
 
-        // 🟢 មុខងារបង្កើត Order និងបង្ហាញ QR Code ផ្ទាល់ខ្លួន
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
@@ -204,17 +203,6 @@
                     currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
                     
-                    // បង្កើត KHQR តាមរយៈ Quick Link ( ABA Pay / KHQR Generator )
-                    // លេខគណនី: 500258373, ឈ្មោះ: SRY VANDY
-                    let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020101021230640016com.ababank.qr@aba0210500258373030301053038405802KH5909SRY%20VANDY6304...`;
-                    
-                    // ប្រើប្រាស់ KHQR Payload ស្តង់ដារ ឬ API Link សម្រាប់ Account 500258373
-                    let khqrString = `https://checkout.payway.com.kh/images/payway-logo.png`; // Placeholder or dynamic generator
-                    
-                    // ជំនួសដោយ Link បង្កើត QR ផ្ទាល់ខ្លួនដែលមានចំនួនទឹកប្រាក់
-                    let dynamicQr = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=ABA:500258373:SRY_VANDY:amount_${totalAmount}`;
-                    
-                    // ប្រើប្រាស់ Bakong / KHQR Standard format ដ៏ស្រួល
                     document.getElementById('qr-image-tag').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ABA_SRY_VANDY_500258373_USD_${totalAmount}`;
 
                     document.getElementById('qr-modal').classList.remove('hidden');
@@ -231,7 +219,7 @@
             }
         }
 
-        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួចផ្ញើសារចូល Telegram
+        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួច កាត់ស្តុក និងផ្ញើសារចូល Telegram
         async function confirmPayment() {
             let btn = document.getElementById('confirm-pay-btn');
             btn.innerText = "កំពុងបញ្ជូនព័ត៌មាន...";
@@ -246,8 +234,21 @@
 
                 let result = await response.json();
                 if (result.success) {
-                    alert('🎉 ការបញ្ជាទិញជោគជ័យ! ទិន្នន័យត្រូវបានផ្ញើជូនម្ចាស់ហាងរួចរាល់។');
-                    location.reload();
+                    // 🟢 កាត់បន្ថយស្តុករបស់ផលិតផលក្នុង Frontend តាមចំនួនដែលបានទិញជាក់ស្តែង
+                    cart.forEach(cartItem => {
+                        let product = products.find(p => p.id === cartItem.id);
+                        if (product) {
+                            product.stock = Math.max(0, product.stock - cartItem.quantity);
+                        }
+                    });
+
+                    renderProducts(); // 🔄 Render បង្ហាញស្តុកថ្មីនៅលើអេក្រង់ភ្លាមៗ
+                    cart = []; // សម្អាតកន្ត្រកទំនិញ
+
+                    alert('🎉 ការបញ្ជាទិញជោគជ័យ! ស្តុកត្រូវបានកាត់បន្ថយ និងទិន្នន័យត្រូវបានផ្ញើជូនម្ចាស់ហាងរួចរាល់។');
+                    
+                    closeQrModal();
+                    updateCartUI();
                 } else {
                     alert('មានបញ្ហាបញ្ជាក់ការទូទាត់!');
                     btn.innerText = "បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)";
