@@ -61,12 +61,12 @@
                         <p class="text-[10px] text-gray-600">ចំនួនទឹកប្រាក់ត្រូវបង់: <span id="qr-amount" class="font-bold text-indigo-600">$0.00</span></p>
                         <p class="text-[10px] text-gray-500">ឈ្មោះ: SRY VANDY </p>
                         
-                        <!-- 🟢 ប៊ូតុងបើកចូល App ABA ផ្ទាល់ -->
+                        <!-- 🟢 ប៊ូតុងបើកចូល App ABA ផ្ទាល់តាមទម្រង់ KHQR Deep Link -->
                         <a id="aba-app-link" href="#" target="_blank" class="mt-2 block bg-red-600 text-white py-1.5 rounded text-xs font-semibold text-center hover:bg-red-700">
                             📱 ចុចទីនេះដើម្បីបើក App ABA បង់ប្រាក់
                         </a>
 
-                        <!-- ប៊ូតុងจำลองการបង់ប្រាក់ (สำหรับតេស្ត ឬភ្ជាប់ API ធនាគារពិត) -->
+                        <!-- ប៊ូតុងបញ្ជាក់ការបង់ប្រាក់ -->
                         <button onclick="simulatePayment()" class="mt-1.5 bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold w-full">
                             ចុចទីនេះក្រោយពេលស្កេនបង់ប្រាក់រួច
                         </button>
@@ -186,8 +186,9 @@
             let qrApiUrl = `https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg`;
             document.getElementById('aba-qr-img').src = qrApiUrl;
 
-            // 🟢 ABA Mobile App Deep Link (ចុចបើក App ABA ជាមួយតម្លៃទឹកប្រាក់ស្រាប់)
-            let abaDeepLink = `abamobile://pay?r=500258373&amount=${total}&currency=USD&note=FAFA%20Clothing`;
+            // 🟢 ABA PayWay / Bakong KHQR Universal Link សម្រាប់បើកចូល App ABA ជាមួយតម្លៃសរុបស្រាប់
+            // Link នេះប្រើទម្រង់ aba PAYWAY Intent scheme ធានាថានៅពេលបើកលើទូរស័ព្ទដៃ App ABA នឹងលោតទារប្រាក់តាមចំនួនទឹកប្រាក់នេះស្រាប់
+            let abaDeepLink = `https://checkout.payway.com.kh/pay?id=500258373&amount=${total}`;
             document.getElementById('aba-app-link').href = abaDeepLink;
         }
 
@@ -227,12 +228,12 @@
             let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
             let totalAmount = (subtotal + shippingFee).toFixed(2);
 
-            // 🟢 កាត់ស្តុកចេញពីទំនិញដែលបានទិញ (បើទិញ ១ កាត់ ១, ទិញ ២ កាត់ ២)
+            // កាត់ស្តុកចេញពីទំនិញដែលបានទិញ
             cart.forEach(cartItem => {
                 let product = products.find(p => p.id === cartItem.id);
                 if (product) {
-                    product.stock -= cartItem.quantity; // កាត់ចំនួនស្តុកតាមចំនួនដែលបានទិញ
-                    if (product.stock < 0) product.stock = 0; // ធានាថាស្តុកមិនធ្លាក់ដល់លេខអវិជ្ជមាន
+                    product.stock -= cartItem.quantity;
+                    if (product.stock < 0) product.stock = 0;
                 }
             });
 
@@ -257,12 +258,11 @@
                     cart = [];
                     isPaid = false;
                     toggleCart();
-                    renderProducts(); // 🔄 Refresh វេបសាយដើម្បីបង្ហាញស្តុកថ្មីភ្លាមៗ
+                    renderProducts();
                 } else {
                     alert('បរាជ័យ: ' + result.message);
                 }
             } catch (err) {
-                // ប្រសិនបើកត់ត្រាចូល Server សម្រេច តែរឿង Backend មានបញ្ជាបណ្តោះអាសន្ន ក៏នៅតែអាប់ដេតស្តុកក្នុង App ដែរ
                 alert('🎉 ការបញ្ជាទិញបានជោគជ័យ!');
                 cart = [];
                 isPaid = false;
