@@ -23,15 +23,15 @@
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </main>
 
-    <!-- Modal សម្រាប់បង្ហាញរូបភាពធំ (Image Zoom Modal) -->
+    <!-- Modal រូបភាពធំ -->
     <div id="image-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4 cursor-pointer" onclick="closeImageModal()">
         <div class="relative max-w-sm w-full flex justify-center">
-            <img id="modal-img" src="" alt="Large Product View" class="max-h-[80vh] w-auto rounded-lg shadow-2xl object-contain">
+            <img id="modal-img" src="" alt="Large View" class="max-h-[80vh] w-auto rounded-lg shadow-2xl object-contain">
             <span class="absolute top-2 right-4 text-white text-3xl font-bold">&times;</span>
         </div>
     </div>
 
-    <!-- Cart & Checkout Modal -->
+    <!-- Cart Modal (គ្មាន QR Code ទៀតទេ) -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
             <div>
@@ -40,9 +40,9 @@
                     <button onclick="toggleCart()" class="text-gray-500 font-bold text-xl">&times;</button>
                 </div>
                 
-                <div id="cart-items" class="py-3 space-y-2 border-b max-h-[25vh] overflow-y-auto"></div>
+                <div id="cart-items" class="py-3 space-y-2 border-b max-h-[35vh] overflow-y-auto"></div>
 
-                <!-- Form -->
+                <!-- Form ព័ត៌មាន -->
                 <div class="mt-3 space-y-2">
                     <h3 class="font-bold text-xs text-indigo-600">ព័ត៌មានអ្នកទទួល</h3>
                     <input type="text" id="cus-phone" placeholder="លេខទូរសព្ទ (Phone Number)" class="w-full border rounded px-3 py-1.5 text-xs">
@@ -52,25 +52,6 @@
                         <option value="express">ដឹកជញ្ជូនដល់ទីកន្លែង (+ $2.00)</option>
                         <option value="store">មកយកហាងផ្ទាល់ (ឥតគិតថ្លៃ)</option>
                     </select>
-
-                    <!-- ABA QR Section -->
-                    <div class="border-t pt-2 mt-2 text-center bg-gray-50 p-2 rounded">
-                        <h4 class="font-bold text-xs text-indigo-600 mb-1">ស្កេនបង់ប្រាក់តាម ABA</h4>
-                        <!-- QR Code បង្ហាញចំនួនទឹកប្រាក់សរុបដាយស្វ័យប្រវត្តិ -->
-                        <img id="aba-qr-img" src="" alt="Dynamic ABA QR" class="w-28 h-28 mx-auto object-cover border rounded mb-1">
-                        <p class="text-[10px] text-gray-600">ចំនួនទឹកប្រាក់ត្រូវបង់: <span id="qr-amount" class="font-bold text-indigo-600">$0.00</span></p>
-                        <p class="text-[10px] text-gray-500">ឈ្មោះ: SRY VANDY </p>
-                        
-                        <!-- 🟢 ប៊ូតុងបើកចូល App ABA ផ្ទាល់តាមទម្រង់ KHQR Deep Link -->
-                        <a id="aba-app-link" href="#" target="_blank" class="mt-2 block bg-red-600 text-white py-1.5 rounded text-xs font-semibold text-center hover:bg-red-700">
-                            📱 ចុចទីនេះដើម្បីបើក App ABA បង់ប្រាក់
-                        </a>
-
-                        <!-- ប៊ូតុងបញ្ជាក់ការបង់ប្រាក់ -->
-                        <button onclick="simulatePayment()" class="mt-1.5 bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold w-full">
-                            ចុចទីនេះក្រោយពេលស្កេនបង់ប្រាក់រួច
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -79,9 +60,51 @@
                     <span>សរុបទឹកប្រាក់សរុប:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <button onclick="checkout()" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
+                <!-- ចុច Checkout ដើម្បីទៅបើក Modal បង់ប្រាក់ -->
+                <button onclick="startCheckoutProcess()" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
                     បញ្ជាទិញឥឡូវនេះ (Checkout)
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🟢 POPUP MODAL បង់ប្រាក់ REAL-TIME + COUNTDOWN 1 ម៉ោង -->
+    <div id="payment-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-xl p-5 text-center relative shadow-2xl">
+            <button onclick="closePaymentModal()" class="absolute top-2 right-3 text-gray-400 text-2xl font-bold">&times;</button>
+            
+            <div id="payment-step-qr">
+                <h3 class="font-bold text-base text-gray-800">ស្កេនបង់ប្រាក់តាម ABA</h3>
+                <p class="text-xs text-red-500 font-semibold mt-1">រយះពេលបង់ប្រាក់នៅសល់: <span id="timer-display" class="font-bold">60:00</span></p>
+
+                <div class="my-3 bg-gray-50 p-3 rounded-lg border">
+                    <img id="checkout-qr-img" src="https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg" class="w-40 h-40 mx-auto object-cover border rounded shadow-sm">
+                    <p class="text-sm font-bold text-indigo-600 mt-2">ចំនួនទឹកប្រាក់: <span id="pay-amount-display">$0.00</span></p>
+                    <p class="text-xs text-gray-600 mt-0.5">ឈ្មោះ: <strong>SRY VANDY</strong> (500258373)</p>
+                </div>
+
+                <div class="flex items-center justify-center gap-2 text-xs text-gray-500">
+                    <div class="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    កំពុងរង់ចាំការបង់ប្រាក់ពីធនាគារ...
+                </div>
+            </div>
+
+            <!-- 🟢 បង្ហាញពេលបង់ប្រាក់ជោគជ័យ -->
+            <div id="payment-step-success" class="hidden py-6">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">
+                    ✅
+                </div>
+                <h3 class="text-lg font-bold text-green-600">អ្នកបានបង់ប្រាក់ជោគជ័យ!</h3>
+                <p class="text-xs text-gray-500 mt-1">ទិន្នន័យនៃការទិញត្រូវ បានផ្ញើទៅកាន់ម្ចាស់ហាងរួចរាល់។</p>
+            </div>
+
+            <!-- 🔴 បង្ហាញពេលផុតកំណត់ 1 ម៉ោង (បរាជ័យ) -->
+            <div id="payment-step-failed" class="hidden py-6">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl font-bold">
+                    ❌
+                </div>
+                <h3 class="text-lg font-bold text-red-600">ការទិញរបស់អ្នកបរាជ័យ</h3>
+                <p class="text-xs text-gray-500 mt-1">រយះពេលបង់ប្រាក់ 1 ម៉ោងត្រូវបានផុតកំណត់!</p>
             </div>
         </div>
     </div>
@@ -91,22 +114,20 @@
         tg.expand();
 
         const products = [
-            { id: 1, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 5, image: "https://i.postimg.cc/0NrGyrGt/858535232-122143330293104345-8003998162307616562-n.jpg" },
+            { id: 1, name: "អាវយឺត FREE SIZE", price: 0.05, stock: 5, image: "https://i.postimg.cc/0NrGyrGt/858535232-122143330293104345-8003998162307616562-n.jpg" },
             { id: 2, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 3, image: "https://i.postimg.cc/HkY4F6rY/858998600-122143328523104345-9154920380344446311-n.jpg" },
             { id: 3, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 2, image: "https://i.postimg.cc/T1R3T7By/859090829-122143330215104345-4641336911256672944-n.jpg" },
             { id: 4, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 4, image: "https://i.postimg.cc/k4CnyYJL/859396177-122143328499104345-4898313489564552661-n.jpg" },
             { id: 5, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 1, image: "https://i.postimg.cc/kG1qqnQn/859396179-122143328535104345-7526329722242687048-n.jpg" },
             { id: 6, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 6, image: "https://i.postimg.cc/sXKR4V0f/859784793-122143328547104345-5525957976114747478-n.jpg" },
             { id: 7, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/brJf6KKV/859980286-122143330197104345-5978106523108566575-n.jpg" },
-            { id: 8, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/XqzStsWV/863325406-122143330281104345-4670333600097983632-n.jpg" },
-            { id: 9, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
-            { id: 10, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
-            { id: 11, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
-            { id: 12, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
+            { id: 8, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/XqzStsWV/863325406-122143330281104345-4670333600097983632-n.jpg" }
         ];
 
         let cart = [];
-        let isPaid = false; // ស្ថានភាពនៃការបង់ប្រាក់
+        let timerInterval = null;
+        let pollInterval = null;
+        let currentOrderId = null;
 
         function renderProducts() {
             document.getElementById('product-grid').innerHTML = products.map(p => `
@@ -115,16 +136,10 @@
                     <div class="p-2 flex flex-col justify-between flex-grow">
                         <h3 class="text-xs font-medium">${p.name}</h3>
                         <p class="text-indigo-600 font-bold text-xs mt-1">$${p.price.toFixed(2)}</p>
-                        
-                        <!-- បង្ហាញស្តុក ឬ អស់ស្តុក -->
                         <div class="text-[10px] mt-1 mb-1">
-                            ${p.stock > 0 ? `<span class="text-gray-500">ស្តុក: <strong class="text-green-600">${p.stock}</strong></span>` : `<span class="text-red-500 font-bold">អស់ស្តុក (Out of Stock)</span>`}
+                            ${p.stock > 0 ? `<span class="text-gray-500">ស្តុក: <strong class="text-green-600">${p.stock}</strong></span>` : `<span class="text-red-500 font-bold">អស់ស្តុក</span>`}
                         </div>
-
-                        <!-- ប៊ូតុងបញ្ជូលក្នុងកន្ត្រក -->
-                        <button onclick="addToCart(${p.id})" 
-                            class="py-1 rounded text-[10px] font-semibold ${p.stock > 0 ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}"
-                            ${p.stock === 0 ? 'disabled' : ''}>
+                        <button onclick="addToCart(${p.id})" class="py-1 rounded text-[10px] font-semibold ${p.stock > 0 ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}" ${p.stock === 0 ? 'disabled' : ''}>
                             ${p.stock > 0 ? 'បញ្ជូលក្នុងកន្ត្រក' : 'អស់ស្តុក'}
                         </button>
                     </div>
@@ -132,27 +147,14 @@
             `).join('');
         }
 
-        function openImageModal(imageSrc) {
-            document.getElementById('modal-img').src = imageSrc;
-            document.getElementById('image-modal').classList.remove('hidden');
-        }
-
-        function closeImageModal() {
-            document.getElementById('image-modal').classList.add('hidden');
-        }
-
         function addToCart(id) {
             let p = products.find(item => item.id === id);
             if (!p || p.stock <= 0) return;
-
             let exist = cart.find(item => item.id === id);
-            let currentQtyInCart = exist ? exist.quantity : 0;
-
-            if (currentQtyInCart >= p.stock) {
-                alert('⚠️ ទំនិញក្នុងស្តុកមានត្រឹមតែ ' + p.stock + ' ប៉ុណ្ណោះ!');
+            if (exist && exist.quantity >= p.stock) {
+                alert('⚠️ លើសចំនួនស្តុកដែលមាន!');
                 return;
             }
-
             if (exist) exist.quantity++;
             else cart.push({ ...p, quantity: 1 });
             updateCartUI();
@@ -161,14 +163,11 @@
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.quantity, 0);
             let container = document.getElementById('cart-items');
-            
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-center text-xs py-2">កន្ត្រកទទេ</p>';
                 document.getElementById('total-price').innerText = '$0.00';
-                document.getElementById('aba-app-link').href = "#";
                 return;
             }
-
             container.innerHTML = cart.map(i => `
                 <div class="flex justify-between items-center bg-gray-50 p-1.5 rounded text-xs">
                     <span>${i.name} ($${i.price}x${i.quantity})</span>
@@ -178,17 +177,7 @@
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             let shipping = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
-            let total = (subtotal + shipping).toFixed(2);
-
-            document.getElementById('total-price').innerText = `$${total}`;
-            document.getElementById('qr-amount').innerText = `$${total}`;
-
-            let qrApiUrl = `https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg`;
-            document.getElementById('aba-qr-img').src = qrApiUrl;
-
-            // 🟢 ប្រើប្រាស់ ABA Deep Link តាមរយៈទម្រង់ Web Intent (Telegram អនុញ្ញាតឱ្យបើក)
-            let abaDeepLink = `https://pay.ababank.com/pay?amount=${total}&to=500258373&name=SRY%20VANDY&note=FAFA%20Clothing`;
-            document.getElementById('aba-app-link').href = abaDeepLink;
+            document.getElementById('total-price').innerText = `$${(subtotal + shipping).toFixed(2)}`;
         }
 
         function removeItem(id) {
@@ -201,76 +190,101 @@
             updateCartUI();
         }
 
-        function simulatePayment() {
-            isPaid = true;
-            alert('✅ ប្រព័ន្ធបានកត់ត្រាការស្កេនបង់ប្រាក់របស់អ្នករួចរាល់!');
-        }
-
-        async function checkout() {
-            if (cart.length === 0) {
-                alert('សូមជ្រើសរើសទំនិញ!');
-                return;
-            }
-            if (!isPaid) {
-                alert('⚠️ សូមស្កេនបង់ប្រាក់តាម QR Code ជាមុនសិន រួចចុចប៊ូតុងបញ្ជាក់ការបង់ប្រាក់!');
-                return;
-            }
-
+        // 🟢 មុខងារចាប់ផ្តើមការ Checkout (បើក Modal បង់ប្រាក់)
+        async function startCheckoutProcess() {
+            if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
-            if (!phone || !address) {
-                alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំងឱ្យបានគ្រប់គ្រាន់!');
-                return;
-            }
+            if (!phone || !address) { alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំង!'); return; }
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
             let totalAmount = (subtotal + shippingFee).toFixed(2);
 
-            // កាត់ស្តុកចេញពីទំនិញដែលបានទិញ
-            cart.forEach(cartItem => {
-                let product = products.find(p => p.id === cartItem.id);
-                if (product) {
-                    product.stock -= cartItem.quantity;
-                    if (product.stock < 0) product.stock = 0;
-                }
-            });
+            currentOrderId = 'ORD-' + Date.now();
+            document.getElementById('pay-amount-display').innerText = `$${totalAmount}`;
+            
+            // បើក Modal QR
+            document.getElementById('payment-step-qr').classList.remove('hidden');
+            document.getElementById('payment-step-success').classList.add('hidden');
+            document.getElementById('payment-step-failed').classList.add('hidden');
+            document.getElementById('payment-modal').classList.remove('hidden');
 
-            // ផ្ញាទិន្នន័យទៅកាន់ Backend Server
-            try {
-                let response = await fetch('https://fafa-backend.onrender.com/api/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        cart,
-                        phone,
-                        address,
-                        shippingFee,
-                        totalAmount,
-                        paymentStatus: 'PAID'
-                    })
-                });
+            // 1. ចាប់ផ្តើមនាឡិការាប់ថយក្រោយ 1 ម៉ោង (3600 វិនាទី)
+            startTimer(3600);
 
-                let result = await response.json();
-                if (result.success) {
-                    alert('🎉 ការបញ្ជាទិញបានជោគជ័យ និងកាត់ស្តុកជោគជ័យ!');
-                    cart = [];
-                    isPaid = false;
-                    toggleCart();
-                    renderProducts();
-                } else {
-                    alert('បរាជ័យ: ' + result.message);
+            // 2. ចាប់ផ្តើមសួរទៅកាន់ Backend Server ដើម្បីដឹងថាអតិថិជនបង់លុយពិតប្រាកដ ឬនៅ (Real-time Polling)
+            startPaymentPolling(currentOrderId, totalAmount, phone, address, shippingFee);
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            let timeLeft = seconds;
+            timerInterval = setInterval(() => {
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                document.getElementById('timer-display').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    clearInterval(pollInterval);
+                    // ផុតកំណត់ ១ ម៉ោង -> បង្ហាញបរាជ័យ
+                    document.getElementById('payment-step-qr').classList.add('hidden');
+                    document.getElementById('payment-step-failed').classList.remove('hidden');
                 }
-            } catch (err) {
-                alert('🎉 ការបញ្ជាទិញបានជោគជ័យ!');
-                cart = [];
-                isPaid = false;
-                toggleCart();
-                renderProducts(); 
-            }
+                timeLeft--;
+            }, 1000);
+        }
+
+        // 🟢 មុខងារត្រួតពិនិត្យការបង់ប្រាក់ Real-time ជាមួយ Backend
+        function startPaymentPolling(orderId, totalAmount, phone, address, shippingFee) {
+            clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                try {
+                    // ផ្ញើសំណើទៅ Server ដើម្បី check ការបង់ប្រាក់
+                    let response = await fetch('https://fafa-backend.onrender.com/api/check-payment-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId, amount: totalAmount })
+                    });
+                    let res = await response.json();
+
+                    // ប្រសិនបើ Server បញ្ជាក់ថា "បង់ប្រាក់ពិតប្រាកដរួចរាល់"
+                    if (res.isPaid) {
+                        clearInterval(pollInterval);
+                        clearInterval(timerInterval);
+
+                        // កាត់ស្តុក
+                        cart.forEach(c => {
+                            let p = products.find(prod => prod.id === c.id);
+                            if (p) p.stock = Math.max(0, p.stock - c.quantity);
+                        });
+
+                        // ប្តូរអេក្រង់ទៅជា សញ្ញាគ្រីស ✅
+                        document.getElementById('payment-step-qr').classList.add('hidden');
+                        document.getElementById('payment-step-success').classList.remove('hidden');
+
+                        // លុបកន្ត្រក និង Refresh
+                        cart = [];
+                        setTimeout(() => {
+                            closePaymentModal();
+                            toggleCart();
+                            renderProducts();
+                        }, 3000);
+                    }
+                } catch (e) {
+                    console.log("Polling error...", e);
+                }
+            }, 3000); // ឆែកមើលរៀងរាល់ ៣ វិនាទីម្តង
+        }
+
+        function closePaymentModal() {
+            clearInterval(timerInterval);
+            clearInterval(pollInterval);
+            document.getElementById('payment-modal').classList.add('hidden');
         }
 
         renderProducts();
     </script>
 </body>
-</html>
+</html> 
