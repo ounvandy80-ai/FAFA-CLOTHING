@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAFA Clothing</title>
+    <title>FAFA Clothing - Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -64,17 +64,25 @@
                     <button onclick="toggleCart()" class="text-gray-500 font-bold text-xl">&times;</button>
                 </div>
                 
-                <div id="cart-items" class="py-3 space-y-2 border-b max-h-[35vh] overflow-y-auto"></div>
+                <div id="cart-items" class="py-3 space-y-2 border-b max-h-[30vh] overflow-y-auto"></div>
 
                 <!-- Form ព័ត៌មាន -->
                 <div class="mt-3 space-y-2">
                     <h3 class="font-bold text-xs text-indigo-600">ព័ត៌មានអ្នកទទួល</h3>
+                    
+                    <!-- 🟢 បន្ថែមប្រអប់បញ្ចូលឈ្មោះអ្នកទទួល -->
+                    <input type="text" id="cus-name" placeholder="ឈ្មោះអ្នកទទួល (Full Name)" class="w-full border rounded px-3 py-1.5 text-xs">
+                    
                     <input type="text" id="cus-phone" placeholder="លេខទូរសព្ទ (Phone Number)" class="w-full border rounded px-3 py-1.5 text-xs">
                     <textarea id="cus-address" rows="2" placeholder="ទីតាំងអ្នកទទួល (Address)" class="w-full border rounded px-3 py-1.5 text-xs"></textarea>
                     
-                    <select id="shipping-option" onchange="updateCartUI()" class="w-full border rounded px-3 py-1.5 text-xs">
-                        <option value="express">ដឹកជញ្ជូនដល់ទីកន្លែង (+ $2.00)</option>
-                        <option value="store">មកយកហាងផ្ទាល់ (ឥតគិតថ្លៃ)</option>
+                    <!-- 🟢 បន្ថែមជម្រើសសេវាដឹកជញ្ជូន -->
+                    <label class="block text-[11px] font-semibold text-gray-600 mt-1">សេវាដឹកជញ្ជូន:</label>
+                    <select id="shipping-option" onchange="updateCartUI()" class="w-full border rounded px-3 py-1.5 text-xs bg-white">
+                        <option value="2.00">ដឹកជញ្ជូនដល់ទីកន្លែងធម្មតា (+ $2.00)</option>
+                        <option value="1.50">J&T Express (+ $1.50)</option>
+                        <option value="2.50">វីរៈប៊ុនថាំ Virak Buntham (+ $2.50)</option>
+                        <option value="0.00">មកយកហាងផ្ទាល់ (ឥតគិតថ្លៃ $0.00)</option>
                     </select>
                 </div>
             </div>
@@ -157,8 +165,11 @@
             `).join('');
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            let shipping = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
-            document.getElementById('total-price').innerText = `$${(subtotal + shipping).toFixed(2)}`;
+            
+            // 🟢 ទាញយកតម្លៃដឹកជញ្ជូនតាម value របស់ select
+            let shippingFee = parseFloat(document.getElementById('shipping-option').value) || 0;
+            
+            document.getElementById('total-price').innerText = `$${(subtotal + shippingFee).toFixed(2)}`;
         }
 
         function removeItem(id) {
@@ -173,12 +184,23 @@
 
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
+            
+            let name = document.getElementById('cus-name').value.trim();
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
-            if (!phone || !address) { alert('សូមបំពេញលេខទូរសព្ទ និងទីតាំងរបស់អ្នក!'); return; }
+            
+            // 🟢 ឆែកមើលការបំពេញព័ត៌មាន
+            if (!name || !phone || !address) { 
+                alert('សូមបំពេញ ឈ្មោះ លេខទូរសព្ទ និងទីតាំងឱ្យបានគ្រប់គ្រាន់!'); 
+                return; 
+            }
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
+            
+            let shippingSelect = document.getElementById('shipping-option');
+            let shippingFee = parseFloat(shippingSelect.value) || 0;
+            let shippingName = shippingSelect.options[shippingSelect.selectedIndex].text;
+
             let totalAmount = (subtotal + shippingFee).toFixed(2);
             let orderId = 'FAFA-' + Date.now();
 
@@ -191,7 +213,14 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderId, amount: totalAmount, phone, address, shippingFee, cart
+                        orderId, 
+                        amount: totalAmount, 
+                        name,         // 🟢 បញ្ជូនឈ្មោះទៅ Server
+                        phone, 
+                        address, 
+                        shippingFee, 
+                        shippingName, // 🟢 បញ្ជូនប្រភេទសេវាដឹកជញ្ជូនទៅ Server
+                        cart
                     })
                 });
 
@@ -200,9 +229,6 @@
                 if (result.success) {
                     currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
-                    
-                    // 🟢 ត្រង់នេះគឺយករូបភាព QR របស់អ្នកមកបង្ហាញស្រាប់ (មិនបាច់ generate ទៀតទេ)
-                    // document.getElementById('qr-image-tag').src = "LINK_រូបភាព_QR_របស់អ្នក.jpg";
 
                     document.getElementById('qr-modal').classList.remove('hidden');
                     toggleCart();
