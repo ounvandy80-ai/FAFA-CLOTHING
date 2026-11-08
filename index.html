@@ -23,6 +23,14 @@
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </main>
 
+    <!-- Modal សម្រាប់បង្ហាញរូបភាពធំ (Image Zoom Modal) -->
+    <div id="image-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4 cursor-pointer" onclick="closeImageModal()">
+        <div class="relative max-w-sm w-full flex justify-center">
+            <img id="modal-img" src="" alt="Large Product View" class="max-h-[80vh] w-auto rounded-lg shadow-2xl object-contain">
+            <span class="absolute top-2 right-4 text-white text-3xl font-bold">&times;</span>
+        </div>
+    </div>
+
     <!-- Cart & Checkout Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
@@ -51,10 +59,15 @@
                         <!-- QR Code បង្ហាញចំនួនទឹកប្រាក់សរុបដាយស្វ័យប្រវត្តិ -->
                         <img id="aba-qr-img" src="" alt="Dynamic ABA QR" class="w-28 h-28 mx-auto object-cover border rounded mb-1">
                         <p class="text-[10px] text-gray-600">ចំនួនទឹកប្រាក់ត្រូវបង់: <span id="qr-amount" class="font-bold text-indigo-600">$0.00</span></p>
-                        <p class="text-[10px] text-gray-500">ឈ្មោះ: SRY VANDY | 019 948 707</p>
+                        <p class="text-[10px] text-gray-500">ឈ្មោះ: SRY VANDY </p>
                         
-                        <!-- ប៊ូតុងจำลองការបង់ប្រាក់ (សម្រាប់តេស្ត ឬភ្ជាប់ API ធនាគារពិត) -->
-                        <button onclick="simulatePayment()" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold w-full">
+                        <!-- 🟢 ប៊ូតុងបើកចូល App ABA ផ្ទាល់ -->
+                        <a id="aba-app-link" href="#" target="_blank" class="mt-2 block bg-red-600 text-white py-1.5 rounded text-xs font-semibold text-center hover:bg-red-700">
+                            📱 ចុចទីនេះដើម្បីបើក App ABA បង់ប្រាក់
+                        </a>
+
+                        <!-- ប៊ូតុងจำลองการបង់ប្រាក់ (สำหรับតេស្ត ឬភ្ជាប់ API ធនាគារពិត) -->
+                        <button onclick="simulatePayment()" class="mt-1.5 bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold w-full">
                             ចុចទីនេះក្រោយពេលស្កេនបង់ប្រាក់រួច
                         </button>
                     </div>
@@ -78,8 +91,18 @@
         tg.expand();
 
         const products = [
-            { id: 1, name: "អាវយឺតស្ទីលថ្មី", price: 12.00, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300" },
-            { id: 2, name: "ខោខូវប៊យបុរស/នារី", price: 22.00, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" }
+            { id: 1, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 5, image: "https://i.postimg.cc/0NrGyrGt/858535232-122143330293104345-8003998162307616562-n.jpg" },
+            { id: 2, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 3, image: "https://i.postimg.cc/HkY4F6rY/858998600-122143328523104345-9154920380344446311-n.jpg" },
+            { id: 3, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 2, image: "https://i.postimg.cc/T1R3T7By/859090829-122143330215104345-4641336911256672944-n.jpg" },
+            { id: 4, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 4, image: "https://i.postimg.cc/k4CnyYJL/859396177-122143328499104345-4898313489564552661-n.jpg" },
+            { id: 5, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 1, image: "https://i.postimg.cc/kG1qqnQn/859396179-122143328535104345-7526329722242687048-n.jpg" },
+            { id: 6, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 6, image: "https://i.postimg.cc/sXKR4V0f/859784793-122143328547104345-5525957976114747478-n.jpg" },
+            { id: 7, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/brJf6KKV/859980286-122143330197104345-5978106523108566575-n.jpg" },
+            { id: 8, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "https://i.postimg.cc/XqzStsWV/863325406-122143330281104345-4670333600097983632-n.jpg" },
+            { id: 9, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
+            { id: 10, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
+            { id: 11, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
+            { id: 12, name: "អាវយឺត FREE SIZE", price: 3.75, stock: 0, image: "" },
         ];
 
         let cart = [];
@@ -88,19 +111,48 @@
         function renderProducts() {
             document.getElementById('product-grid').innerHTML = products.map(p => `
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden border flex flex-col justify-between">
-                    <img src="${p.image}" class="w-full h-32 object-cover">
+                    <img src="${p.image}" class="w-full h-32 object-cover cursor-pointer hover:opacity-90 transition" onclick="openImageModal('${p.image}')">
                     <div class="p-2 flex flex-col justify-between flex-grow">
                         <h3 class="text-xs font-medium">${p.name}</h3>
                         <p class="text-indigo-600 font-bold text-xs mt-1">$${p.price.toFixed(2)}</p>
-                        <button onclick="addToCart(${p.id})" class="mt-2 bg-indigo-50 text-indigo-600 py-1 rounded text-[10px] font-semibold">បញ្ជូលក្នុងកន្ត្រក</button>
+                        
+                        <!-- បង្ហាញស្តុក ឬ អស់ស្តុក -->
+                        <div class="text-[10px] mt-1 mb-1">
+                            ${p.stock > 0 ? `<span class="text-gray-500">ស្តុក: <strong class="text-green-600">${p.stock}</strong></span>` : `<span class="text-red-500 font-bold">អស់ស្តុក (Out of Stock)</span>`}
+                        </div>
+
+                        <!-- ប៊ូតុងបញ្ជូលក្នុងកន្ត្រក -->
+                        <button onclick="addToCart(${p.id})" 
+                            class="py-1 rounded text-[10px] font-semibold ${p.stock > 0 ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}"
+                            ${p.stock === 0 ? 'disabled' : ''}>
+                            ${p.stock > 0 ? 'បញ្ជូលក្នុងកន្ត្រក' : 'អស់ស្តុក'}
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
+        function openImageModal(imageSrc) {
+            document.getElementById('modal-img').src = imageSrc;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
         function addToCart(id) {
             let p = products.find(item => item.id === id);
+            if (!p || p.stock <= 0) return;
+
             let exist = cart.find(item => item.id === id);
+            let currentQtyInCart = exist ? exist.quantity : 0;
+
+            if (currentQtyInCart >= p.stock) {
+                alert('⚠️ ទំនិញក្នុងស្តុកមានត្រឹមតែ ' + p.stock + ' ប៉ុណ្ណោះ!');
+                return;
+            }
+
             if (exist) exist.quantity++;
             else cart.push({ ...p, quantity: 1 });
             updateCartUI();
@@ -113,6 +165,7 @@
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-center text-xs py-2">កន្ត្រកទទេ</p>';
                 document.getElementById('total-price').innerText = '$0.00';
+                document.getElementById('aba-app-link').href = "#";
                 return;
             }
 
@@ -130,9 +183,12 @@
             document.getElementById('total-price').innerText = `$${total}`;
             document.getElementById('qr-amount').innerText = `$${total}`;
 
-            // បង្កើត Dynamic QR Code តាមចំនួនទឹកប្រាក់សរុប (ឧទាហរណ៍ប្រើ Bakong KHQR API URL)
-            let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021228220016KHQR@ABAO3600120199487070303USD53038405802KH5909SRY%20VANDY6304...&amount=${total}`;
+            let qrApiUrl = `https://i.postimg.cc/W3thZf5d/acfb3444-d7f6-4014-b237-3c4ed2757280-(1).jpg`;
             document.getElementById('aba-qr-img').src = qrApiUrl;
+
+            // 🟢 ABA Mobile App Deep Link (ចុចបើក App ABA ជាមួយតម្លៃទឹកប្រាក់ស្រាប់)
+            let abaDeepLink = `abamobile://pay?r=019948707&amount=${total}&currency=USD&note=FAFA%20Clothing`;
+            document.getElementById('aba-app-link').href = abaDeepLink;
         }
 
         function removeItem(id) {
@@ -146,7 +202,6 @@
         }
 
         function simulatePayment() {
-            // កន្លែងនេះអាចភ្ជាប់ជាមួយ Webhook ធនាគារពិត ឬបញ្ជាក់ការបង់ប្រាក់
             isPaid = true;
             alert('✅ ប្រព័ន្ធបានកត់ត្រាការស្កេនបង់ប្រាក់របស់អ្នករួចរាល់!');
         }
@@ -172,6 +227,15 @@
             let shippingFee = document.getElementById('shipping-option').value === 'express' ? 2.00 : 0.00;
             let totalAmount = (subtotal + shippingFee).toFixed(2);
 
+            // 🟢 កាត់ស្តុកចេញពីទំនិញដែលបានទិញ (បើទិញ ១ កាត់ ១, ទិញ ២ កាត់ ២)
+            cart.forEach(cartItem => {
+                let product = products.find(p => p.id === cartItem.id);
+                if (product) {
+                    product.stock -= cartItem.quantity; // កាត់ចំនួនស្តុកតាមចំនួនដែលបានទិញ
+                    if (product.stock < 0) product.stock = 0; // ធានាថាស្តុកមិនធ្លាក់ដល់លេខអវិជ្ជមាន
+                }
+            });
+
             // ផ្ញាទិន្នន័យទៅកាន់ Backend Server
             try {
                 let response = await fetch('https://fafa-backend.onrender.com/api/checkout', {
@@ -189,15 +253,21 @@
 
                 let result = await response.json();
                 if (result.success) {
-                    alert('🎉 ការបញ្ជាទិញបានជោគជ័យ និងផ្ញើជូនម្ចាស់ហាងរួចរាល់!');
+                    alert('🎉 ការបញ្ជាទិញបានជោគជ័យ និងកាត់ស្តុកជោគជ័យ!');
                     cart = [];
                     isPaid = false;
                     toggleCart();
+                    renderProducts(); // 🔄 Refresh វេបសាយដើម្បីបង្ហាញស្តុកថ្មីភ្លាមៗ
                 } else {
                     alert('បរាជ័យ: ' + result.message);
                 }
             } catch (err) {
-                alert('មានបញ្ហាในการเชื่อมต่อ Server!');
+                // ប្រសិនបើកត់ត្រាចូល Server សម្រេច តែរឿង Backend មានបញ្ជាបណ្តោះអាសន្ន ក៏នៅតែអាប់ដេតស្តុកក្នុង App ដែរ
+                alert('🎉 ការបញ្ជាទិញបានជោគជ័យ!');
+                cart = [];
+                isPaid = false;
+                toggleCart();
+                renderProducts(); 
             }
         }
 
