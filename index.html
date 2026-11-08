@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAFA Clothing</title>
+    <title>FAFA Clothing - Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -40,7 +40,8 @@
             <p class="text-[11px] text-gray-600 mb-2">ឈ្មោះ: <strong class="text-black">SRY VANDY</strong><br>លេខគណនី: <strong class="text-indigo-600">500258373</strong></p>
             
             <div id="qr-container" class="bg-white p-2 rounded-lg border mb-3 w-48 h-48 flex items-center justify-center shadow-inner">
-                <img id="qr-image-tag" src="" alt="ABA QR Code" class="w-full h-full object-contain">
+                <!-- 🟢 ដាក់ Link រូបភាព QR Code របស់អ្នកនៅត្រង់ src នេះ -->
+                <img id="qr-image-tag" src="https://i.postimg.cc/XNmvLHTr/6c99554f-f27b-4c3a-9e91-a202a0e24eaa.jpg" alt="ABA QR Code" class="w-full h-full object-contain">
             </div>
 
             <p class="text-xs font-semibold mb-2">ទឹកប្រាក់សរុប: <span id="qr-amount" class="text-indigo-600 font-bold text-sm"></span></p>
@@ -98,7 +99,6 @@
         let products = [];
         let cart = [];
 
-        // 🟢 ទាញយកទិន្នន័យផលិតផលពី Server ពេលចាប់ផ្តើម
         async function fetchProducts() {
             try {
                 let response = await fetch('https://fafa-backend.onrender.com/api/products');
@@ -183,7 +183,7 @@
             let orderId = 'FAFA-' + Date.now();
 
             let btn = document.getElementById('checkout-btn');
-            btn.innerText = "កំពុងបង្កើត QR...";
+            btn.innerText = "កំពុងរៀបចំ QR...";
             btn.disabled = true;
 
             try {
@@ -191,12 +191,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderId,
-                        amount: totalAmount,
-                        phone,
-                        address,
-                        shippingFee,
-                        cart
+                        orderId, amount: totalAmount, phone, address, shippingFee, cart
                     })
                 });
 
@@ -205,7 +200,9 @@
                 if (result.success) {
                     currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
-                    document.getElementById('qr-image-tag').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ABA_SRY_VANDY_500258373_USD_${totalAmount}`;
+                    
+                    // 🟢 ត្រង់នេះគឺយករូបភាព QR របស់អ្នកមកបង្ហាញស្រាប់ (មិនបាច់ generate ទៀតទេ)
+                    // document.getElementById('qr-image-tag').src = "LINK_រូបភាព_QR_របស់អ្នក.jpg";
 
                     document.getElementById('qr-modal').classList.remove('hidden');
                     toggleCart();
@@ -221,7 +218,6 @@
             }
         }
 
-        // 🟢 បញ្ជាក់ការបង់ប្រាក់រួច Server ធ្វើការកាត់ស្តុកជាអចិន្ត្រៃយ៍
         async function confirmPayment() {
             let btn = document.getElementById('confirm-pay-btn');
             btn.innerText = "កំពុងបញ្ជូនព័ត៌មាន...";
@@ -236,12 +232,11 @@
 
                 let result = await response.json();
                 if (result.success) {
-                    products = result.products; // ទទួលបានស្តុកចុងក្រោយពី Server
-                    renderProducts(); // Render ឡើងវិញ
-                    cart = []; // សម្អាតកន្ត្រក
+                    products = result.products; 
+                    renderProducts(); 
+                    cart = []; 
 
                     alert('🎉 ការបញ្ជាទិញជោគជ័យ! ស្តុកត្រូវបានកាត់បន្ថយលើប្រព័ន្ធ Server រួចរាល់។');
-                    
                     closeQrModal();
                     updateCartUI();
                 } else {
@@ -270,7 +265,6 @@
             document.getElementById('image-modal').classList.add('hidden');
         }
 
-        // ចាប់ផ្តើមទាញយកទំនិញពេលចូលវេបសាយ
         fetchProducts();
     </script>
 </body>
