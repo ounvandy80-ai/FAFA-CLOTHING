@@ -122,10 +122,8 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 🟢 ទាញយក Telegram User ID ស្វ័យប្រវត្តិ (បើបើកក្រៅ Telegram នឹងប្រើ ID តេស្តសាកល្បង)
-        let telegramId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'guest_user';
-
         let currentTranId = null;
+        let currentOrderData = null; // 🟢 រក្សាទុកព័ត៌មាន Order បណ្តោះអាសន្នពេលកំពុងទូទាត់
         let products = [];
         let cart = [];
 
@@ -201,41 +199,38 @@
             updateCartUI();
         }
 
-        // 🟢 Functions សម្រាប់បើកបិទ និងទាញយកប្រវត្តិការទិញ
-        async function openHistoryModal() {
+        // 🟢 បើក Modal មើលប្រវត្តិការទិញពី LocalStorage
+        function openHistoryModal() {
             document.getElementById('history-modal').classList.remove('hidden');
             let container = document.getElementById('history-items');
-            container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">កំពុងទាញយក...</p>';
+            
+            let localOrders = JSON.parse(localStorage.getItem('fafa_my_orders')) || [];
 
-            try {
-                let response = await fetch(`https://fafa-backend.onrender.com/api/my-orders?telegramId=${telegramId}`);
-                let orders = await response.json();
-
-                if (orders.length === 0) {
-                    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">មិនទាន់មានប្រវត្តិការបញ្ជាទិញនៅឡើយទេ</p>';
-                    return;
-                }
-
-                container.innerHTML = orders.map(o => `
-                    <div class="bg-gray-50 p-3 rounded-lg border text-xs space-y-1">
-                        <div class="flex justify-between font-bold text-indigo-600">
-                            <span>កូដ: ${o.orderId}</span>
-                            <span class="text-green-600">បានបង់ប្រាក់</span>
-                        </div>
-                        <p class="text-[11px] text-gray-500">ថ្ងៃទី: ${o.date}</p>
-                        <div class="border-t pt-1 mt-1 space-y-0.5">
-                            ${o.cart.map(i => `<p>• ${i.name} ($${i.price} x ${i.quantity})</p>`).join('')}
-                        </div>
-                        <div class="border-t pt-1 mt-1 font-semibold flex justify-between">
-                            <span>សរុប (+ដឹកជញ្ជូន):</span>
-                            <span class="text-indigo-600">$${o.amount}</span>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<p class="text-xs text-red-500 text-center py-4">បរាជ័យในการទាញយកទិន្នន័យ</p>';
+            if (localOrders.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">មិនទាន់មានប្រវត្តិការបញ្ជាទិញនៅឡើយទេ</p>';
+                return;
             }
+
+            container.innerHTML = localOrders.map(o => `
+                <div class="bg-gray-50 p-3 rounded-lg border text-xs space-y-1">
+                    <div class="flex justify-between font-bold text-indigo-600">
+                        <span>កូដ: ${o.orderId}</span>
+                        <span class="text-green-600">បានបង់ប្រាក់រួច</span>
+                    </div>
+                    <p class="text-[11px] text-gray-500">ថ្ងៃទី: ${o.date}</p>
+                    <div class="border-t pt-1 mt-1 space-y-0.5">
+                        ${o.cart.map(i => `<p>• ${i.name} ($${i.price} x ${i.quantity})</p>`).join('')}
+                    </div>
+                    <div class="text-[11px] text-gray-600 pt-1">
+                        🚚 ${o.shippingName} <br>
+                        📍 ទីតាំង: ${o.address}
+                    </div>
+                    <div class="border-t pt-1 mt-1 font-semibold flex justify-between">
+                        <span>សរុបទឹកប្រាក់:</span>
+                        <span class="text-indigo-600">$${o.amount}</span>
+                    </div>
+                </div>
+            `).reverse().join('');
         }
 
         function closeHistoryModal() {
@@ -262,6 +257,18 @@
             let totalAmount = (subtotal + shippingFee).toFixed(2);
             let orderId = 'FAFA-' + Date.now();
 
+            // 🟢 រក្សាទុកข้อมูล order បណ្តោះអាសន្ន
+            currentOrderData = {
+                orderId,
+                amount: totalAmount,
+                name,
+                phone,
+                address,
+                shippingName,
+                cart: [...cart],
+                date: new Date().toLocaleString('km-KH')
+            };
+
             let btn = document.getElementById('checkout-btn');
             btn.innerText = "កំពុងរៀបចំ QR...";
             btn.disabled = true;
@@ -273,7 +280,6 @@
                     body: JSON.stringify({
                         orderId, 
                         amount: totalAmount, 
-                        telegramId, // 🟢 បញ្ជូន Telegram ID ទៅ Server
                         name, 
                         phone, 
                         address, 
@@ -318,7 +324,16 @@
                 if (result.success) {
                     products = result.products; 
                     renderProducts(); 
+                    
+                    // 🟢 រក្សាទុកចូល LocalStorage របស់អតិថិជនពេលបង់ប្រាក់ជោគជ័យ
+                    let localOrders = JSON.parse(localStorage.getItem('fafa_my_orders')) || [];
+                    if (currentOrderData) {
+                        localOrders.push(currentOrderData);
+                        localStorage.setItem('fafa_my_orders', JSON.stringify(localOrders));
+                    }
+
                     cart = []; 
+                    currentOrderData = null;
 
                     alert('🎉 ការបញ្ជាទិញជោគជ័យ! ស្តុកត្រូវបានកាត់បន្ថយលើប្រព័ន្ធ Server រួចរាល់។');
                     closeQrModal();
