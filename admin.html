@@ -5,160 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAFA Clothing - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kantumruy Pro', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans pb-24">
+<body class="bg-gray-100 min-h-screen">
 
-    <!-- Header -->
-    <header class="bg-indigo-600 text-white shadow-md px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
-        <a href="index.html" class="bg-white text-indigo-600 px-3 py-1.5 rounded text-xs font-semibold hover:bg-gray-100">ទៅកាន់ហាងវិញ</a>
-    </header>
-
-    <main class="max-w-4xl mx-auto p-4 space-y-6">
-        
-        <!-- 📦 ផ្នែកបន្ថែមផលិតផលថ្មី -->
-        <div class="bg-white p-5 rounded-lg shadow-sm border">
-            <h2 class="text-base font-bold text-indigo-600 mb-3">➕ បន្ថែមផលិតផលថ្មី</h2>
-            <form id="add-product-form" onsubmit="addProduct(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input type="number" id="new-id" placeholder="ID (ឧទាហរណ៍: 9, 10...)" class="border p-2 rounded text-xs" required>
-                <input type="text" id="new-name" placeholder="ឈ្មោះផលិតផល" class="border p-2 rounded text-xs" required>
-                <input type="number" step="0.01" id="new-price" placeholder="តម្លៃ ($)" class="border p-2 rounded text-xs" required>
-                <input type="number" id="new-stock" placeholder="ចំនួនស្តុក (Stock)" class="border p-2 rounded text-xs" required>
-                <input type="url" id="new-image" placeholder="ลิงก์រូបភាព (Image URL)" class="border p-2 rounded text-xs md:col-span-2" required>
-                <button type="submit" class="bg-indigo-600 text-white py-2 rounded text-xs font-semibold hover:bg-indigo-700 md:col-span-2">រក្សាទុកផលិតផលថ្មី</button>
-            </form>
+    <!-- 🔐 ផ្ទាំង Login សម្រាប់ផ្ទៀងផ្ទាត់ Gmail -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
+            <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
+            <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលអ៊ីមែលផ្ទាល់ខ្លួនរបស់អ្នកដើម្បីចូលកាន់ប្រព័ន្ធ</p>
+            <input type="email" id="adminEmailInput" placeholder="admin@gmail.com" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
+            <p id="loginError" class="text-red-500 text-sm mt-3 hidden">អ៊ីមែលមិនត្រឹមត្រូវទេ! អ្នកមិនមានសិទ្ធិចូលទេ។</p>
         </div>
+    </div>
 
-        <!-- 📋 បញ្ជីផលិតផលនិងកែប្រែស្តុក -->
-        <div class="bg-white p-5 rounded-lg shadow-sm border">
-            <h2 class="text-base font-bold text-indigo-600 mb-3">📦 គ្រប់គ្រងស្តុកផលិតផលស្រាប់</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-gray-100 border-b">
-                            <th class="p-2">រូបភាព</th>
-                            <th class="p-2">ឈ្មោះ</th>
-                            <th class="p-2">តម្លៃ</th>
-                            <th class="p-2">ស្តុកបច្ចុប្បន្ន</th>
-                            <th class="p-2 text-center">សកម្មភាព</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-product-list">
-                        <tr><td colspan="5" class="text-center p-4 text-gray-400">កំពុងទាញយកទំនិញ...</td></tr>
-                    </tbody>
-                </table>
+    <!-- 🛠️ ផ្ទាំង Admin Panel ដើម (នឹងបង្ហាញលុះត្រាតែ Login ត្រូវ) -->
+    <div id="adminContent" class="hidden">
+        <header class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
+            <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
+            <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-red-600 transition">ចាកចេញ (Logout)</button>
+        </header>
+
+        <main class="max-w-5xl mx-auto p-6">
+            <!-- បន្ថែមផលិតផលថ្មី -->
+            <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="number" id="newId" placeholder="ID (ឧទាហរណ៍: 9, 10...)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="newName" placeholder="ឈ្មោះផលិតផល" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newPrice" placeholder="តម្លៃ ($)" step="0.01" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newStock" placeholder="ចំនួនស្តុក (Stock)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="newImage" placeholder="លីងរូបភាព (Image URL)" class="border p-2.5 rounded-lg col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <button onclick="addProduct()" class="mt-4 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
-        </div>
 
-    </main>
+            <!-- គ្រប់គ្រងស្តុកផលិតផលដែលមានស្រាប់ -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រងស្តុកផលិតផលស្រាប់</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 border-b">
+                                <th class="p-3">រូបភាព</th>
+                                <th class="p-3">ឈ្មោះ</th>
+                                <th class="p-3">តម្លៃ</th>
+                                <th class="p-3">ស្តុកបច្ចុប្បន្ន</th>
+                                <th class="p-3 text-center">សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList">
+                            <!-- ទិន្នន័យទាញមកបង្ហាញដោយ JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
-        const BACKEND_URL = 'https://fafa-backend.onrender.com';
+        const BACKEND_URL = 'https://fafa-backend.onrender.com'; // Link Server Render របស់បង
+        const OWNER_EMAIL = 'fafaclothing99@gmail.com'; // អ៊ីមែលដែលអនុញ្ញាតឱ្យចូល
 
-        // ទាញយកផលិតផលមកបង្ហាញ
-        async function fetchAdminProducts() {
-            try {
-                let res = await fetch(`${BACKEND_URL}/api/products`);
-                let products = await res.json();
-                let tbody = document.getElementById('admin-product-list');
-
-                if (products.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">មិនមានផលិតផលទេ</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = products.map(p => `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-2"><img src="${p.image}" class="w-10 h-10 object-cover rounded"></td>
-                        <td class="p-2 font-medium">${p.name} (ID: ${p.id})</td>
-                        <td class="p-2 text-indigo-600 font-bold">$${p.price.toFixed(2)}</td>
-                        <td class="p-2">
-                            <input type="number" id="stock-${p.id}" value="${p.stock}" class="border w-16 p-1 rounded text-center">
-                        </td>
-                        <td class="p-2 text-center space-x-1">
-                            <button onclick="updateStock(${p.id})" class="bg-green-600 text-white px-2.5 py-1 rounded hover:bg-green-700">កែស្តុក</button>
-                            <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-2.5 py-1 rounded hover:bg-red-600">លុប</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-                alert('បរាជ័យក្នុងការទាញទិន្នន័យ!');
+        // ពិនិត្យមើលថាតើធ្លាប់ Login រួចរាល់ហើយឬยังពេលបើក Page
+        window.onload = function() {
+            let loggedUser = localStorage.getItem('admin_email');
+            if (loggedUser === OWNER_EMAIL) {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadProducts();
             }
         }
 
-        // កែស្តុកផលិតផល
-        async function updateStock(id) {
-            let newStock = parseInt(document.getElementById(`stock-${id}`).value);
+        // មុខងារផ្ទៀងផ្ទាត់ពេលចុច Login
+        function checkAdminLogin() {
+            let inputEmail = document.getElementById('adminEmailInput').value.trim();
+            if (inputEmail === OWNER_EMAIL) {
+                localStorage.setItem('admin_email', OWNER_EMAIL);
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadProducts();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        // មុខងារ Logout ចាកចេញ
+        function logoutAdmin() {
+            localStorage.removeItem('admin_email');
+            location.reload();
+        }
+
+        // ទាញយកទិន្នន័យផលិតផលមកបង្ហាញ
+        async function loadProducts() {
             try {
-                let res = await fetch(`${BACKEND_URL}/api/admin/update-stock`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, stock: newStock })
+                let res = await fetch(`${BACKEND_URL}/api/products`);
+                let products = await res.json();
+                let listHtml = '';
+
+                products.forEach(p => {
+                    listHtml += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-3"><img src="${p.image}" class="w-12 h-12 object-cover rounded"></td>
+                            <td class="p-3 font-medium text-gray-800">${p.name} (ID: ${p.id})</td>
+                            <td class="p-3 text-blue-600 font-semibold">$${p.price}</td>
+                            <td class="p-3">
+                                <input type="number" id="stock-${p.id}" value="${p.stock}" class="w-20 border p-1.5 rounded text-center">
+                            </td>
+                            <td class="p-3 text-center space-x-2">
+                                <button onclick="updateStock(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 transition">កែស្តុក</button>
+                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition">លុប</button>
+                            </td>
+                        </tr>
+                    `;
                 });
-                let result = await res.json();
-                if (result.success) {
-                    alert('✅ កែស្តុកបានដោយជោគជ័យ!');
-                    fetchAdminProducts();
-                } else {
-                    alert('❌ ' + result.message);
-                }
+                document.getElementById('productList').innerHTML = listHtml;
             } catch (err) {
-                console.error(err);
-                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
+                console.error("Error loading products:", err);
+            }
+        }
+
+        // កែស្តុក
+        async function updateStock(id) {
+            let newStock = document.getElementById(`stock-${id}`).value;
+            let res = await fetch(`${BACKEND_URL}/api/admin/update-stock`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(id), stock: Number(newStock) })
+            });
+            let data = await res.json();
+            if (data.success) {
+                alert('កែស្តុកបានជោគជ័យ!');
+                loadProducts();
+            } else {
+                alert('បរាជ័យ: ' + data.message);
             }
         }
 
         // បន្ថែមផលិតផលថ្មី
-        async function addProduct(e) {
-            e.preventDefault();
-            let newProduct = {
-                id: parseInt(document.getElementById('new-id').value),
-                name: document.getElementById('new-name').value,
-                price: parseFloat(document.getElementById('new-price').value),
-                stock: parseInt(document.getElementById('new-stock').value),
-                image: document.getElementById('new-image').value
-            };
+        async function addProduct() {
+            let id = document.getElementById('newId').value;
+            let name = document.getElementById('newName').value;
+            let price = document.getElementById('newPrice').value;
+            let stock = document.getElementById('newStock').value;
+            let image = document.getElementById('newImage').value;
 
-            try {
-                let res = await fetch(`${BACKEND_URL}/api/admin/add-product`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newProduct)
-                });
-                let result = await res.json();
-                if (result.success) {
-                    alert('🎉 បន្ថែមផលិតផលថ្មីបានជោគជ័យ!');
-                    document.getElementById('add-product-form').reset();
-                    fetchAdminProducts();
-                } else {
-                    alert('❌ ' + result.message);
-                }
-            } catch (err) {
-                console.error(err);
-                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
+            if (!id || !name || !price || !stock || !image) {
+                alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!');
+                return;
+            }
+
+            let res = await fetch(`${BACKEND_URL}/api/admin/add-product`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(id), name, price: Number(price), stock: Number(stock), image })
+            });
+            let data = await res.json();
+            if (data.success) {
+                alert('បានបន្ថែមផលិតផលថ្មីដោយជោគជ័យ!');
+                location.reload();
+            } else {
+                alert('បរាជ័យ: ' + data.message);
             }
         }
 
         // លុបផលិតផល
         async function deleteProduct(id) {
             if (!confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) return;
-            try {
-                let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, { method: 'DELETE' });
-                let result = await res.json();
-                if (result.success) {
-                    alert('🗑️ លុបបានដោយជោគជ័យ!');
-                    fetchAdminProducts();
-                } else {
-                    alert('❌ ' + result.message);
-                }
-            } catch (err) {
-                console.error(err);
-                alert('មានបញ្ហាក្នុងការតភ្ជាប់ Server!');
+            let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, {
+                method: 'DELETE'
+            });
+            let data = await res.json();
+            if (data.success) {
+                alert('លុបបានជោគជ័យ!');
+                loadProducts();
+            } else {
+                alert('បរាជ័យ: ' + data.message);
             }
         }
-
-        fetchAdminProducts();
     </script>
 </body>
 </html>
