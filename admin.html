@@ -17,7 +17,7 @@
         <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
             <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នកដើម្បីចូលកាន់ប្រព័ន្ធ</p>
-            <input type="email" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
             <p id="loginError" class="text-red-500 text-sm mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ! អ្នកមិនមានសិទ្ធិចូលទេ។</p>
         </div>
@@ -31,6 +31,28 @@
         </header>
 
         <main class="max-w-5xl mx-auto p-6">
+            
+            <!-- 📋 (បន្ថែមថ្មី) បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ -->
+            <div class="bg-white p-6 rounded-xl shadow-md mb-8 border-2 border-yellow-400">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders)</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-yellow-50 text-gray-700 border-b">
+                                <th class="p-3">កូដបញ្ជាទិញ</th>
+                                <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
+                                <th class="p-3">ទំនិញកុម្ម៉ង់</th>
+                                <th class="p-3">ទឹកប្រាក់សរុប</th>
+                                <th class="p-3 text-center">សកម្មភាព (Approve / Reject)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingOrderList">
+                            <!-- ទិន្នន័យទាញមកបង្ហាញដោយ JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- បន្ថែមផលិតផលថ្មី -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី</h2>
@@ -69,7 +91,7 @@
 
     <script>
         const BACKEND_URL = 'https://fafa-backend.onrender.com'; // Link Server Render របស់បង
-        const OWNER_EMAIL = 'Vandy25012003'; // អ៊ីមែលដែលអនុញ្ញាតឱ្យចូល
+        const OWNER_EMAIL = 'Vandy25012003'; // ពាក្យសម្ងាត់ / អ៊ីមែលដែលអនុញ្ញាតឱ្យចូល
 
         // ពិនិត្យមើលថាតើធ្លាប់ Login រួចរាល់ហើយឬยังពេលបើក Page
         window.onload = function() {
@@ -78,6 +100,7 @@
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadProducts();
+                loadPendingOrders(); // (បន្ថែមថ្មី) ទាញយកបញ្ជី Order រង់ចាំ
             }
         }
 
@@ -89,6 +112,7 @@
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadProducts();
+                loadPendingOrders();
             } else {
                 document.getElementById('loginError').style.display = 'block';
             }
@@ -98,6 +122,62 @@
         function logoutAdmin() {
             localStorage.removeItem('admin_email');
             location.reload();
+        }
+
+        // (បន្ថែមថ្មី) ទាញយកបញ្ជី Order រង់ចាំផ្ទៀងផ្ទាត់មកបង្ហាញ
+        async function loadPendingOrders() {
+            try {
+                let res = await fetch(`${BACKEND_URL}/api/admin/pending-orders`);
+                let orders = await res.json();
+                let listHtml = '';
+
+                if (orders.length === 0) {
+                    listHtml = `<tr><td colspan="5" class="p-4 text-center text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំផ្ទៀងផ្ទាត់ទេ</td></tr>`;
+                } else {
+                    orders.forEach(o => {
+                        let cartDetails = o.cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                        listHtml += `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-3 font-semibold text-indigo-600">${o.orderId}</td>
+                                <td class="p-3 text-gray-800">${o.name || 'គ្មានឈ្មោះ'}<br><span class="text-sm text-gray-500">${o.phone}</span></td>
+                                <td class="p-3 text-sm text-gray-600">${cartDetails}</td>
+                                <td class="p-3 font-bold text-green-600">$${o.amount}</td>
+                                <td class="p-3 text-center space-x-2">
+                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700 transition">Approve (យល់ព្រម)</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-3 py-1.5 rounded text-sm hover:bg-red-600 transition">Reject (បដិសេធ)</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById('pendingOrderList').innerHTML = listHtml;
+            } catch (err) {
+                console.error("Error loading pending orders:", err);
+            }
+        }
+
+        // (បន្ថែមថ្មី) មុខងារចុច Approve ឬ Reject
+        async function handleOrderAction(orderId, action) {
+            let confirmMsg = action === 'APPROVE' ? 'តើអ្នកពិតជាចង់អនុម័ត (Approve) ការបញ្ជាទិញនេះមែនទេ?' : 'តើអ្នកពិតជាចង់បដិសេធ (Reject) ការបញ្ជាទិញនេះមែនទេ?';
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                let res = await fetch(`${BACKEND_URL}/api/admin/order-action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId, action })
+                });
+                let data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    loadPendingOrders();
+                    loadProducts(); // Refresh ស្តុកឡើងវិញបើមានការកាត់ស្តុក
+                } else {
+                    alert('បរាជ័យ: ' + data.message);
+                }
+            } catch (err) {
+                console.error("Error updating order action:", err);
+            }
         }
 
         // ទាញយកទិន្នន័យផលិតផលមកបង្ហាញ
