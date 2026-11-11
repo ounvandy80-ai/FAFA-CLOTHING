@@ -53,6 +53,7 @@
         </div>
     </div>
 
+    <!-- History Modal -->
     <div id="history-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl">
             <div>
@@ -66,6 +67,7 @@
         </div>
     </div>
 
+    <!-- QR Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-xs p-5 rounded-xl shadow-2xl text-center flex flex-col items-center">
             <h3 class="text-base font-bold text-indigo-600 mb-1">ស្កេនបង់ប្រាក់ qua ABA KHQR</h3>
@@ -82,6 +84,7 @@
         </div>
     </div>
 
+    <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
             <div>
@@ -122,12 +125,26 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let telegramId = tg.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : 'test_user_vandy';
+        let userName = tg.initDataUnsafe?.user?.first_name || 'Guest';
 
         let currentTranId = null;
         let products = [];
         let cart = [];
         let selectedProductForDetail = null;
         let selectedColorObj = null;
+
+        // Ping Online Status ពេលចូល App
+        async function pingServer() {
+            try {
+                await fetch('https://fafa-backend.onrender.com/api/user/ping', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId, name: userName })
+                });
+            } catch (e) { console.error(e); }
+        }
+        pingServer();
+        setInterval(pingServer, 30000); // Ping រៀងរាល់ 30 វិនាទី
 
         async function fetchProducts() {
             try {
@@ -210,18 +227,13 @@
             }
         }
 
-        function closeDetailModal() {
-            document.getElementById('product-detail-modal').classList.add('hidden');
-        }
+        function closeDetailModal() { document.getElementById('product-detail-modal').classList.add('hidden'); }
 
         function addSelectedToCart() {
             if (!selectedProductForDetail || !selectedColorObj) return;
             let p = selectedProductForDetail;
 
-            if (selectedColorObj.stock <= 0) {
-                alert('⚠️ ពណ៌នេះអស់ស្តុកហើយ!');
-                return;
-            }
+            if (selectedColorObj.stock <= 0) { alert('⚠️ ពណ៌នេះអស់ស្តុកហើយ!'); return; }
 
             let exist = cart.find(item => item.id === p.id && item.selectedColor === selectedColorObj.colorName);
             let currentInCart = exist ? exist.quantity : 0;
@@ -231,11 +243,8 @@
                 return;
             }
 
-            if (exist) {
-                exist.quantity++;
-            } else {
-                cart.push({ ...p, quantity: 1, selectedColor: selectedColorObj.colorName });
-            }
+            if (exist) { exist.quantity++; } 
+            else { cart.push({ ...p, quantity: 1, selectedColor: selectedColorObj.colorName }); }
 
             closeDetailModal();
             updateCartUI();
@@ -298,7 +307,7 @@
                             ${o.cart.map(i => `<p>• ${i.name} ${i.selectedColor ? `(ពណ៌: ${i.selectedColor})` : ''} ($${i.price} x ${i.quantity})</p>`).join('')}
                         </div>
                         <div class="border-t pt-1 mt-1 font-semibold flex justify-between">
-                            <span>សរុบ:</span>
+                            <span>សរុប:</span>
                             <span class="text-indigo-600">$${o.amount}</span>
                         </div>
                     </div>
@@ -315,6 +324,17 @@
             let address = document.getElementById('cus-address').value.trim();
             if (!name || !phone || !address) { alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!'); return; }
 
+            // 📍 ទាញយកទីតាំង GPS របស់អតិថិជន
+            let location = null;
+            if (navigator.geolocation) {
+                try {
+                    let position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    location = { lat: position.coords.latitude, lng: position.coords.longitude };
+                } catch (e) { console.log("Location access denied or timeout"); }
+            }
+
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             let shippingFee = parseFloat(document.getElementById('shipping-option').value) || 0;
             let shippingName = document.getElementById('shipping-option').selectedOptions[0].text;
@@ -322,18 +342,28 @@
             let orderId = 'FAFA-' + Date.now();
 
             try {
+                await fetch('https://fafa-backend.onrender.com/api/user/ping', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId, name, phone })
+                });
+
                 let res = await fetch('https://fafa-backend.onrender.com/api/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegramId, orderId, amount: totalAmount, name, phone, address, shippingFee, shippingName, cart })
+                    body: JSON.stringify({ telegramId, orderId, amount: totalAmount, name, phone, address, location, shippingFee, shippingName, cart })
                 });
                 let result = await res.json();
-                if (result.success) {
-                    currentTranId = result.tran_id;
-                    document.getElementById('qr-amount').innerText = `$${totalAmount}`;
-                    document.getElementById('qr-modal').classList.remove('hidden');
-                    toggleCart();
+                
+                if (!result.success) {
+                    alert('⚠️ ' + result.message);
+                    return;
                 }
+
+                currentTranId = result.tran_id;
+                document.getElementById('qr-amount').innerText = `$${totalAmount}`;
+                document.getElementById('qr-modal').classList.remove('hidden');
+                toggleCart();
             } catch (err) { console.error(err); }
         }
 
