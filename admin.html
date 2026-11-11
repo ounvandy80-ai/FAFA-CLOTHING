@@ -12,7 +12,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-    <!-- 🔐 ផ្ទាំង Login សម្រាប់ផ្ទៀងផ្ទាត់ Gmail -->
+    <!-- 🔐 ផ្ទាំង Login សម្រាប់ផ្ទៀងផ្ទាត់ -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- 🛠️ ផ្ទាំង Admin Panel ដើម (នឹងបង្ហាញលុះត្រាតែ Login ត្រូវ) -->
+    <!-- 🛠️ ផ្ទាំង Admin Panel -->
     <div id="adminContent" class="hidden">
         <header class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
             <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
@@ -32,7 +32,7 @@
 
         <main class="max-w-5xl mx-auto p-6">
             
-            <!-- 📋 (បន្ថែមថ្មី) បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ -->
+            <!-- 📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders) -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8 border-2 border-yellow-400">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders)</h2>
                 <div class="overflow-x-auto">
@@ -41,29 +41,45 @@
                             <tr class="bg-yellow-50 text-gray-700 border-b">
                                 <th class="p-3">កូដបញ្ជាទិញ</th>
                                 <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
-                                <th class="p-3">ទំនិញកុម្ម៉ង់</th>
+                                <th class="p-3">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
                                 <th class="p-3">ទឹកប្រាក់សរុប</th>
                                 <th class="p-3 text-center">សកម្មភាព (Approve / Reject)</th>
                             </tr>
                         </thead>
                         <tbody id="pendingOrderList">
-                            <!-- ទិន្នន័យទាញមកបង្ហាញដោយ JavaScript -->
+                            <tr><td colspan="5" class="p-4 text-center text-gray-500">កំពុងទាញយក...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- បន្ថែមផលិតផលថ្មី -->
+            <!-- បន្ថែមផលិតផលថ្មី (មានបញ្ចូលជម្រើសពណ៌) -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី</h2>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី និងពណ៌ផ្សេងៗ</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="number" id="newId" placeholder="ID (ឧទាហរណ៍: 9, 10...)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="newName" placeholder="ឈ្មោះផលិតផល" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="number" id="newPrice" placeholder="តម្លៃ ($)" step="0.01" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="number" id="newStock" placeholder="ចំនួនស្តុក (Stock)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="newImage" placeholder="លីងរូបភាព (Image URL)" class="border p-2.5 rounded-lg col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newId" placeholder="ID ផលិតផល (ឧទាហរណ៍: 9, 10...)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="newName" placeholder="ឈ្មោះផលិតផល (ឧ: អាវយឺត SNOOPY)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newPrice" placeholder="តម្លៃ ($) ឧ: 3.75" step="0.01" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newStock" placeholder="ចំនួនស្តុកសរុប (Stock)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="newImage" placeholder="លីងរូបភាពគោល (Main Image URL)" class="border p-2.5 rounded-lg col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <button onclick="addProduct()" class="mt-4 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
+
+                <!-- 🎨 ផ្នែកបញ្ចូលពណ៌ផ្សេងៗ -->
+                <div class="mt-4 border-t pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-bold text-sm text-gray-700">🎨 ជម្រើសពណ៌ផ្សេងៗ (Color Variants):</label>
+                        <button onclick="addColorRow()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold hover:bg-gray-300">+ បន្ថែមពណ៌ផ្សេងទៀត</button>
+                    </div>
+                    <div id="color-inputs-container" class="space-y-2">
+                        <div class="flex gap-2 items-center color-row">
+                            <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ក្រហម)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                            <input type="text" placeholder="លីងរូបភាពពណ៌នេះ (Image URL)" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                            <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
             <!-- គ្រប់គ្រងស្តុកផលិតផលដែលមានស្រាប់ -->
@@ -90,21 +106,19 @@
     </div>
 
     <script>
-        const BACKEND_URL = 'https://fafa-backend.onrender.com'; // Link Server Render របស់បង
-        const OWNER_EMAIL = 'Vandy25012003'; // ពាក្យសម្ងាត់ / អ៊ីមែលដែលអនុញ្ញាតឱ្យចូល
+        const BACKEND_URL = 'https://fafa-backend.onrender.com';
+        const OWNER_EMAIL = 'Vandy25012003';
 
-        // ពិនិត្យមើលថាតើធ្លាប់ Login រួចរាល់ហើយឬยังពេលបើក Page
         window.onload = function() {
             let loggedUser = localStorage.getItem('admin_email');
             if (loggedUser === OWNER_EMAIL) {
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadProducts();
-                loadPendingOrders(); // (បន្ថែមថ្មី) ទាញយកបញ្ជី Order រង់ចាំ
+                loadPendingOrders();
             }
         }
 
-        // មុខងារផ្ទៀងផ្ទាត់ពេលចុច Login
         function checkAdminLogin() {
             let inputEmail = document.getElementById('adminEmailInput').value.trim();
             if (inputEmail === OWNER_EMAIL) {
@@ -118,13 +132,24 @@
             }
         }
 
-        // មុខងារ Logout ចាកចេញ
         function logoutAdmin() {
             localStorage.removeItem('admin_email');
             location.reload();
         }
 
-        // (បន្ថែមថ្មី) ទាញយកបញ្ជី Order រង់ចាំផ្ទៀងផ្ទាត់មកបង្ហាញ
+        // បន្ថែមជួរដេកសម្រាប់បញ្ចូលពណ៌ថ្មី
+        function addColorRow() {
+            let container = document.getElementById('color-inputs-container');
+            let div = document.createElement('div');
+            div.className = "flex gap-2 items-center color-row";
+            div.innerHTML = `
+                <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ស)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                <input type="text" placeholder="លីងរូបភាពពណ៌នេះ (Image URL)" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
+            `;
+            container.appendChild(div);
+        }
+
         async function loadPendingOrders() {
             try {
                 let res = await fetch(`${BACKEND_URL}/api/admin/pending-orders`);
@@ -135,7 +160,7 @@
                     listHtml = `<tr><td colspan="5" class="p-4 text-center text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំផ្ទៀងផ្ទាត់ទេ</td></tr>`;
                 } else {
                     orders.forEach(o => {
-                        let cartDetails = o.cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                        let cartDetails = o.cart.map(item => `${item.name} ${item.selectedColor ? `(ពណ៌: ${item.selectedColor})` : ''} (x${item.quantity})`).join(', ');
                         listHtml += `
                             <tr class="border-b hover:bg-gray-50">
                                 <td class="p-3 font-semibold text-indigo-600">${o.orderId}</td>
@@ -156,9 +181,8 @@
             }
         }
 
-        // (បន្ថែមថ្មី) មុខងារចុច Approve ឬ Reject
         async function handleOrderAction(orderId, action) {
-            let confirmMsg = action === 'APPROVE' ? 'តើអ្នកពិតជាចង់អនុម័ត (Approve) ការបញ្ជាទិញនេះមែនទេ?' : 'តើអ្នកពិតជាចង់បដិសេធ (Reject) ការបញ្ជាទិញនេះមែនទេ?';
+            let confirmMsg = action === 'APPROVE' ? 'តើអ្នកពិតជាចង់ Approve និងផ្ញើសារចូល Telegram មែនទេ?' : 'តើអ្នកពិតជាចង់ Reject ការបញ្ជាទិញនេះមែនទេ?';
             if (!confirm(confirmMsg)) return;
 
             try {
@@ -171,7 +195,7 @@
                 if (data.success) {
                     alert(data.message);
                     loadPendingOrders();
-                    loadProducts(); // Refresh ស្តុកឡើងវិញបើមានការកាត់ស្តុក
+                    loadProducts();
                 } else {
                     alert('បរាជ័យ: ' + data.message);
                 }
@@ -180,7 +204,6 @@
             }
         }
 
-        // ទាញយកទិន្នន័យផលិតផលមកបង្ហាញ
         async function loadProducts() {
             try {
                 let res = await fetch(`${BACKEND_URL}/api/products`);
@@ -209,7 +232,6 @@
             }
         }
 
-        // កែស្តុក
         async function updateStock(id) {
             let newStock = document.getElementById(`stock-${id}`).value;
             let res = await fetch(`${BACKEND_URL}/api/admin/update-stock`, {
@@ -226,7 +248,7 @@
             }
         }
 
-        // បន្ថែមផលិតផលថ្មី
+        // មុខងារបន្ថែមផលិតផលថ្មីជាមួយពណ៌
         async function addProduct() {
             let id = document.getElementById('newId').value;
             let name = document.getElementById('newName').value;
@@ -235,25 +257,35 @@
             let image = document.getElementById('newImage').value;
 
             if (!id || !name || !price || !stock || !image) {
-                alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!');
+                alert('សូមបំពេញព័ត៌មានសំខាន់ៗឱ្យបានគ្រប់គ្រាន់!');
                 return;
             }
+
+            // ប្រមូលយកតម្លៃពណ៌និងរូបភាពពី Input Rows
+            let colors = [];
+            let colorRows = document.querySelectorAll('.color-row');
+            colorRows.forEach(row => {
+                let colorName = row.querySelector('.color-name-input').value.trim();
+                let colorImg = row.querySelector('.color-img-input').value.trim();
+                if (colorName && colorImg) {
+                    colors.push({ colorName, image: colorImg });
+                }
+            });
 
             let res = await fetch(`${BACKEND_URL}/api/admin/add-product`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: Number(id), name, price: Number(price), stock: Number(stock), image })
+                body: JSON.stringify({ id: Number(id), name, price: Number(price), stock: Number(stock), image, colors })
             });
             let data = await res.json();
             if (data.success) {
-                alert('បានបន្ថែមផលិតផលថ្មីដោយជោគជ័យ!');
+                alert('បានបន្ថែមផលិតផលថ្មីជោគជ័យ!');
                 location.reload();
             } else {
                 alert('បរាជ័យ: ' + data.message);
             }
         }
 
-        // លុបផលិតផល
         async function deleteProduct(id) {
             if (!confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) return;
             let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, {
