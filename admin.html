@@ -28,7 +28,7 @@
             <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-red-600 transition">ចាកចេញ (Logout)</button>
         </header>
 
-        <main class="max-w-5xl mx-auto p-6">
+        <main class="max-w-6xl mx-auto p-6">
             
             <div class="bg-white p-6 rounded-xl shadow-md mb-8 border-2 border-yellow-400">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders)</h2>
@@ -36,21 +36,21 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-yellow-50 text-gray-700 border-b">
-                                <th class="p-3">កូដបញ្ជាទិញ</th>
-                                <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
-                                <th class="p-3">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
-                                <th class="p-3">ទឹកប្រាក់សរុប</th>
-                                <th class="p-3 text-center">សកម្មភាព</th>
+                                <th class="p-3 text-xs">កូដបញ្ជាទិញ</th>
+                                <th class="p-3 text-xs">ឈ្មោះ & លេខទូរសព្ទ</th>
+                                <th class="p-3 text-xs">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
+                                <th class="p-3 text-xs">ទឹកប្រាក់សរុប</th>
+                                <th class="p-3 text-xs text-center">សកម្មភាព</th>
                             </tr>
                         </thead>
                         <tbody id="pendingOrderList">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-500">កំពុងទាញយក...</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-xs text-gray-500">កំពុងទាញយក...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- បន្ថែមផលិតផលថ្មី និងស្តុកតាមពណ៌ -->
+            <!-- បន្ថែមផលិតផលថ្មី -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី និងស្តុកតាមពណ៌</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -68,26 +68,27 @@
                     </div>
                     <div id="color-inputs-container" class="space-y-2">
                         <div class="flex gap-2 items-center color-row">
-                            <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ខ្មៅ)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                            <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ខ្មៅ)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
                             <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
-                            <input type="number" placeholder="ស្តុក (ឧ: 1)" class="color-stock-input border p-2 rounded-lg text-xs w-20">
+                            <input type="number" placeholder="ស្តុក" class="color-stock-input border p-2 rounded-lg text-xs w-20">
                             <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
                         </div>
                     </div>
                 </div>
 
-                <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
+                <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold text-xs hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
+            <!-- គ្រប់គ្រងស្តុក និងកែប្រែព័ត៌មានទំនិញ -->
             <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រងស្តុកផលិតផលស្រាប់</h2>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រង និងកែប្រែព័ត៌មានទំនិញ</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-600 border-b">
-                                <th class="p-3">រូបភាព</th>
-                                <th class="p-3">ឈ្មោះ</th>
-                                <th class="p-3">តម្លៃ</th>
+                            <tr class="bg-gray-100 text-gray-600 border-b text-xs">
+                                <th class="p-3">រូបភាព URL</th>
+                                <th class="p-3">ឈ្មោះផលិតផល</th>
+                                <th class="p-3">តម្លៃ ($)</th>
                                 <th class="p-3">ស្តុកសរុប</th>
                                 <th class="p-3 text-center">សកម្មភាព</th>
                             </tr>
@@ -136,9 +137,9 @@
             let div = document.createElement('div');
             div.className = "flex gap-2 items-center color-row";
             div.innerHTML = `
-                <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ផ្កាឈូក)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                <input type="text" placeholder="ឈ្មោះពណ៌" class="color-name-input border p-2 rounded-lg text-xs flex-1">
                 <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
-                <input type="number" placeholder="ស្តុក (ឧ: 1)" class="color-stock-input border p-2 rounded-lg text-xs w-20">
+                <input type="number" placeholder="ស្តុក" class="color-stock-input border p-2 rounded-lg text-xs w-20">
                 <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
             `;
             container.appendChild(div);
@@ -151,28 +152,26 @@
                 let listHtml = '';
 
                 if (orders.length === 0) {
-                    listHtml = `<tr><td colspan="5" class="p-4 text-center text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំទេ</td></tr>`;
+                    listHtml = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំទេ</td></tr>`;
                 } else {
                     orders.forEach(o => {
                         let cartDetails = o.cart.map(item => `${item.name} ${item.selectedColor ? `(ពណ៌: ${item.selectedColor})` : ''} (x${item.quantity})`).join(', ');
                         listHtml += `
-                            <tr class="border-b hover:bg-gray-50">
+                            <tr class="border-b hover:bg-gray-50 text-xs">
                                 <td class="p-3 font-semibold text-indigo-600">${o.orderId}</td>
-                                <td class="p-3 text-gray-800">${o.name || 'គ្មានឈ្មោះ'}<br><span class="text-sm text-gray-500">${o.phone}</span></td>
-                                <td class="p-3 text-sm text-gray-600">${cartDetails}</td>
+                                <td class="p-3 text-gray-800">${o.name || 'គ្មានឈ្មោះ'}<br><span class="text-gray-500">${o.phone}</span></td>
+                                <td class="p-3 text-gray-600">${cartDetails}</td>
                                 <td class="p-3 font-bold text-green-600">$${o.amount}</td>
-                                <td class="p-3 text-center space-x-2">
-                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-3 py-1.5 rounded text-xs">Approve</button>
-                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-3 py-1.5 rounded text-xs">Reject</button>
+                                <td class="p-3 text-center space-x-1">
+                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-2.5 py-1 rounded text-xs">Approve</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-2.5 py-1 rounded text-xs">Reject</button>
                                 </td>
                             </tr>
                         `;
                     });
                 }
                 document.getElementById('pendingOrderList').innerHTML = listHtml;
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function handleOrderAction(orderId, action) {
@@ -188,12 +187,8 @@
                     alert(data.message);
                     loadPendingOrders();
                     loadProducts();
-                } else {
-                    alert('បរាជ័យ: ' + data.message);
-                }
-            } catch (err) {
-                console.error(err);
-            }
+                } else { alert('បរាជ័យ: ' + data.message); }
+            } catch (err) { console.error(err); }
         }
 
         async function loadProducts() {
@@ -203,36 +198,55 @@
                 let listHtml = '';
                 products.forEach(p => {
                     listHtml += `
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-3"><img src="${p.image}" class="w-12 h-12 object-cover rounded"></td>
-                            <td class="p-3 font-medium text-gray-800">${p.name} (ID: ${p.id})</td>
-                            <td class="p-3 text-blue-600 font-semibold">$${p.price}</td>
+                        <tr class="border-b hover:bg-gray-50 text-xs">
                             <td class="p-3">
-                                <input type="number" id="stock-${p.id}" value="${p.stock}" class="w-20 border p-1.5 rounded text-center">
+                                <input type="text" id="img-${p.id}" value="${p.image}" class="w-32 border p-1 rounded text-[11px]">
                             </td>
-                            <td class="p-3 text-center space-x-2">
-                                <button onclick="updateStock(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">កែស្តុក</button>
-                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs">លុប</button>
+                            <td class="p-3">
+                                <input type="text" id="name-${p.id}" value="${p.name}" class="w-40 border p-1 rounded font-medium text-gray-800">
+                                <p class="text-[10px] text-gray-400">ID: ${p.id}</p>
+                            </td>
+                            <td class="p-3">
+                                <input type="number" id="price-${p.id}" value="${p.price}" step="0.01" class="w-20 border p-1 rounded text-blue-600 font-semibold">
+                            </td>
+                            <td class="p-3">
+                                <input type="number" id="stock-${p.id}" value="${p.stock}" class="w-16 border p-1 rounded text-center">
+                            </td>
+                            <td class="p-3 text-center space-x-1">
+                                <button onclick="updateProduct(${p.id})" class="bg-indigo-600 text-white px-2.5 py-1 rounded text-xs hover:bg-indigo-700">កែប្រែ (Save)</button>
+                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-2.5 py-1 rounded text-xs hover:bg-red-600">លុប</button>
                             </td>
                         </tr>
                     `;
                 });
                 document.getElementById('productList').innerHTML = listHtml;
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        async function updateStock(id) {
-            let newStock = document.getElementById(`stock-${id}`).value;
-            let res = await fetch(`${BACKEND_URL}/api/admin/update-stock`, {
+        // មុខងារកែប្រែព័ត៌មានទំនិញទាំងស្រុង
+        async function updateProduct(id) {
+            let name = document.getElementById(`name-${id}`).value.trim();
+            let price = document.getElementById(`price-${id}`).value;
+            let stock = document.getElementById(`stock-${id}`).value;
+            let image = document.getElementById(`img-${id}`).value.trim();
+
+            if (!name || !price || !stock || !image) {
+                alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!');
+                return;
+            }
+
+            let res = await fetch(`${BACKEND_URL}/api/admin/update-product`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: Number(id), stock: Number(newStock) })
+                body: JSON.stringify({ id: Number(id), name, price: Number(price), stock: Number(stock), image })
             });
             let data = await res.json();
-            if (data.success) { alert('កែស្តុកបានជោគជ័យ!'); loadProducts(); }
-            else { alert('បរាជ័យ: ' + data.message); }
+            if (data.success) {
+                alert('🎉 ' + data.message);
+                loadProducts();
+            } else {
+                alert('បរាជ័យ: ' + data.message);
+            }
         }
 
         async function addProduct() {
@@ -266,13 +280,11 @@
             if (data.success) {
                 alert('បានបន្ថែមផលិតផលថ្មីជោគជ័យ!');
                 location.reload();
-            } else {
-                alert('បរាជ័យ: ' + data.message);
-            }
+            } else { alert('បរាជ័យ: ' + data.message); }
         }
 
         async function deleteProduct(id) {
-            if (!confirm('តើអ្នកពិតជាចង់លុបមែនទេ?')) return;
+            if (!confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) return;
             let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, { method: 'DELETE' });
             let data = await res.json();
             if (data.success) { alert('លុបបានជោគជ័យ!'); loadProducts(); }
