@@ -10,37 +10,40 @@
         body { font-family: 'Kantumruy Pro', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen pb-20">
 
+    <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
             <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក</p>
-            <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
-            <p id="loginError" class="text-red-500 text-sm mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!</p>
+            <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
+            <p id="loginError" class="text-red-500 text-xs mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!</p>
         </div>
     </div>
 
+    <!-- Admin Content -->
     <div id="adminContent" class="hidden">
         <header class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
             <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
-            <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-red-600 transition">ចាកចេញ (Logout)</button>
+            <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs hover:bg-red-600 transition">ចាកចេញ (Logout)</button>
         </header>
 
-        <main class="max-w-6xl mx-auto p-6">
+        <main class="max-w-5xl mx-auto p-6 space-y-8">
             
-            <div class="bg-white p-6 rounded-xl shadow-md mb-8 border-2 border-yellow-400">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders)</h2>
+            <!-- Pending Orders -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-2 border-yellow-400">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-yellow-50 text-gray-700 border-b">
-                                <th class="p-3 text-xs">កូដបញ្ជាទិញ</th>
-                                <th class="p-3 text-xs">ឈ្មោះ & លេខទូរសព្ទ</th>
-                                <th class="p-3 text-xs">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
-                                <th class="p-3 text-xs">ទឹកប្រាក់សរុប</th>
-                                <th class="p-3 text-xs text-center">សកម្មភាព</th>
+                            <tr class="bg-yellow-50 text-gray-700 border-b text-xs">
+                                <th class="p-3">កូដបញ្ជាទិញ</th>
+                                <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
+                                <th class="p-3">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
+                                <th class="p-3">ទឹកប្រាក់សរុប</th>
+                                <th class="p-3 text-center">សកម្មភាព</th>
                             </tr>
                         </thead>
                         <tbody id="pendingOrderList">
@@ -50,8 +53,8 @@
                 </div>
             </div>
 
-            <!-- បន្ថែមផលិតផលថ្មី -->
-            <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <!-- Add Product -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី និងស្តុកតាមពណ៌</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="number" id="newId" placeholder="ID ផលិតផល (ឧ: 9, 10...)" class="border p-2.5 rounded-lg text-xs">
@@ -79,16 +82,16 @@
                 <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold text-xs hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
-            <!-- គ្រប់គ្រងស្តុក និងកែប្រែព័ត៌មានទំនិញ -->
+            <!-- Manage Products -->
             <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រង និងកែប្រែព័ត៌មានទំនិញ</h2>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រងស្តុក និងកែប្រែផលិតផល</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 border-b text-xs">
-                                <th class="p-3">រូបភាព URL</th>
+                                <th class="p-3">រូបភាព</th>
                                 <th class="p-3">ឈ្មោះផលិតផល</th>
-                                <th class="p-3">តម្លៃ ($)</th>
+                                <th class="p-3">តម្លៃ</th>
                                 <th class="p-3">ស្តុកសរុប</th>
                                 <th class="p-3 text-center">សកម្មភាព</th>
                             </tr>
@@ -100,9 +103,55 @@
         </main>
     </div>
 
+    <!-- 🛠️ ផ្ទាំង Modal សម្រាប់កែប្រែផលិតផល និងស្តុកតាមពណ៌ -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative my-8">
+            <button onclick="closeEditModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h3 class="text-lg font-bold text-indigo-600 mb-4">✏️ កែប្រែព័ត៌មានទំនិញ និងស្តុកតាមពណ៌</h3>
+            
+            <input type="hidden" id="edit-id">
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold text-gray-600">ឈ្មោះផលិតផល:</label>
+                    <input type="text" id="edit-name" class="w-full border p-2 rounded-lg mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-semibold text-gray-600">តម្លៃ ($):</label>
+                        <input type="number" id="edit-price" step="0.01" class="w-full border p-2 rounded-lg mt-1">
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">ស្តុកសរុប:</label>
+                        <input type="number" id="edit-stock" class="w-full border p-2 rounded-lg mt-1">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold text-gray-600">លីងរូបភាពគោល (Main Image URL):</label>
+                    <input type="text" id="edit-image" class="w-full border p-2 rounded-lg mt-1">
+                </div>
+
+                <!-- កែប្រែពណ៌ និងស្តុកតាមពណ៌ -->
+                <div class="border-t pt-3 mt-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-bold text-gray-700">🎨 កែប្រែពណ៌ និងស្តុកតាមពណ៌:</label>
+                        <button onclick="addEditColorRow('', '', 0)" class="bg-gray-200 text-gray-800 px-2.5 py-1 rounded text-[11px] font-semibold">+ បន្ថែមពណ៌</button>
+                    </div>
+                    <div id="edit-colors-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button onclick="saveProductChanges()" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition">រក្សាទុកការកែប្រែ (Save)</button>
+                <button onclick="closeEditModal()" class="bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-semibold text-xs">បោះបង់</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://fafa-backend.onrender.com';
         const OWNER_EMAIL = 'Vandy25012003';
+        let allProducts = [];
 
         window.onload = function() {
             let loggedUser = localStorage.getItem('admin_email');
@@ -150,7 +199,6 @@
                 let res = await fetch(`${BACKEND_URL}/api/admin/pending-orders`);
                 let orders = await res.json();
                 let listHtml = '';
-
                 if (orders.length === 0) {
                     listHtml = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំទេ</td></tr>`;
                 } else {
@@ -183,38 +231,26 @@
                     body: JSON.stringify({ orderId, action })
                 });
                 let data = await res.json();
-                if (data.success) {
-                    alert(data.message);
-                    loadPendingOrders();
-                    loadProducts();
-                } else { alert('បរាជ័យ: ' + data.message); }
+                if (data.success) { alert(data.message); loadPendingOrders(); loadProducts(); }
+                else { alert('បរាជ័យ: ' + data.message); }
             } catch (err) { console.error(err); }
         }
 
         async function loadProducts() {
             try {
                 let res = await fetch(`${BACKEND_URL}/api/products`);
-                let products = await res.json();
+                allProducts = await res.json();
                 let listHtml = '';
-                products.forEach(p => {
+                allProducts.forEach(p => {
                     listHtml += `
                         <tr class="border-b hover:bg-gray-50 text-xs">
-                            <td class="p-3">
-                                <input type="text" id="img-${p.id}" value="${p.image}" class="w-32 border p-1 rounded text-[11px]">
-                            </td>
-                            <td class="p-3">
-                                <input type="text" id="name-${p.id}" value="${p.name}" class="w-40 border p-1 rounded font-medium text-gray-800">
-                                <p class="text-[10px] text-gray-400">ID: ${p.id}</p>
-                            </td>
-                            <td class="p-3">
-                                <input type="number" id="price-${p.id}" value="${p.price}" step="0.01" class="w-20 border p-1 rounded text-blue-600 font-semibold">
-                            </td>
-                            <td class="p-3">
-                                <input type="number" id="stock-${p.id}" value="${p.stock}" class="w-16 border p-1 rounded text-center">
-                            </td>
+                            <td class="p-3"><img src="${p.image}" class="w-10 h-10 object-cover rounded"></td>
+                            <td class="p-3 font-medium text-gray-800">${p.name}<br><span class="text-[10px] text-gray-400">ID: ${p.id}</span></td>
+                            <td class="p-3 text-blue-600 font-semibold">$${p.price}</td>
+                            <td class="p-3 font-bold">${p.stock}</td>
                             <td class="p-3 text-center space-x-1">
-                                <button onclick="updateProduct(${p.id})" class="bg-indigo-600 text-white px-2.5 py-1 rounded text-xs hover:bg-indigo-700">កែប្រែ (Save)</button>
-                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-2.5 py-1 rounded text-xs hover:bg-red-600">លុប</button>
+                                <button onclick="openEditModal(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">កែប្រែ (Edit)</button>
+                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">លុប</button>
                             </td>
                         </tr>
                     `;
@@ -223,30 +259,78 @@
             } catch (err) { console.error(err); }
         }
 
-        // មុខងារកែប្រែព័ត៌មានទំនិញទាំងស្រុង
-        async function updateProduct(id) {
-            let name = document.getElementById(`name-${id}`).value.trim();
-            let price = document.getElementById(`price-${id}`).value;
-            let stock = document.getElementById(`stock-${id}`).value;
-            let image = document.getElementById(`img-${id}`).value.trim();
+        // បើកផ្ទាំង Modal កែប្រែទំនិញ
+        function openEditModal(id) {
+            let p = allProducts.find(item => item.id === id);
+            if (!p) return;
 
-            if (!name || !price || !stock || !image) {
-                alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!');
-                return;
+            document.getElementById('edit-id').value = p.id;
+            document.getElementById('edit-name').value = p.name;
+            document.getElementById('edit-price').value = p.price;
+            document.getElementById('edit-stock').value = p.stock;
+            document.getElementById('edit-image').value = p.image;
+
+            let container = document.getElementById('edit-colors-container');
+            container.innerHTML = '';
+            if (p.colors && p.colors.length > 0) {
+                p.colors.forEach(c => {
+                    addEditColorRow(c.colorName, c.image, c.stock || 0);
+                });
             }
 
-            let res = await fetch(`${BACKEND_URL}/api/admin/update-product`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: Number(id), name, price: Number(price), stock: Number(stock), image })
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function addEditColorRow(name, img, stock) {
+            let container = document.getElementById('edit-colors-container');
+            let div = document.createElement('div');
+            div.className = "flex gap-2 items-center edit-color-row";
+            div.innerHTML = `
+                <input type="text" value="${name}" placeholder="ឈ្មោះពណ៌" class="edit-color-name border p-1.5 rounded text-xs flex-1">
+                <input type="text" value="${img}" placeholder="លីងរូបភាពពណ៌" class="edit-color-img border p-1.5 rounded text-xs flex-2">
+                <input type="number" value="${stock}" placeholder="ស្តុក" class="edit-color-stock border p-1.5 rounded text-xs w-16 text-center">
+                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2 py-1.5 rounded text-xs">លុប</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        // រក្សាទុកការកែប្រែពី Modal
+        async function saveProductChanges() {
+            let id = Number(document.getElementById('edit-id').value);
+            let name = document.getElementById('edit-name').value.trim();
+            let price = Number(document.getElementById('edit-price').value);
+            let stock = Number(document.getElementById('edit-stock').value);
+            let image = document.getElementById('edit-image').value.trim();
+
+            let colors = [];
+            document.querySelectorAll('.edit-color-row').forEach(row => {
+                let colorName = row.querySelector('.edit-color-name').value.trim();
+                let colorImg = row.querySelector('.edit-color-img').value.trim();
+                let colorStock = Number(row.querySelector('.edit-color-stock').value) || 0;
+                if (colorName && colorImg) {
+                    colors.push({ colorName, image: colorImg, stock: colorStock });
+                }
             });
-            let data = await res.json();
-            if (data.success) {
-                alert('🎉 ' + data.message);
-                loadProducts();
-            } else {
-                alert('បរាជ័យ: ' + data.message);
-            }
+
+            try {
+                let res = await fetch(`${BACKEND_URL}/api/admin/update-product`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, price, stock, image, colors })
+                });
+                let data = await res.json();
+                if (data.success) {
+                    alert('🎉 កែប្រែបានជោគជ័យ!');
+                    closeEditModal();
+                    loadProducts();
+                } else {
+                    alert('បរាជ័យ: ' + data.message);
+                }
+            } catch (err) { console.error(err); }
         }
 
         async function addProduct() {
@@ -257,7 +341,7 @@
             let image = document.getElementById('newImage').value;
 
             if (!id || !name || !price || !stock || !image) {
-                alert('សូមបំពេញព័ត៌មានសំខាន់ៗឱ្យបានគ្រប់គ្រាន់!');
+                alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!');
                 return;
             }
 
