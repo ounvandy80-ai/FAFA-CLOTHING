@@ -13,20 +13,14 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans pb-24">
 
-    <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-10 px-4 py-3 flex justify-between items-center">
         <h1 class="text-xl font-bold text-indigo-600">👗 FAFA Clothing</h1>
         <div class="flex items-center gap-2">
-            <button onclick="openHistoryModal()" class="bg-gray-100 text-indigo-600 px-3 py-1.5 rounded-full text-sm font-medium border border-indigo-200">
-                📦 ប្រវត្តិ
-            </button>
-            <button onclick="toggleCart()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">
-                🛒 កន្ត្រក (<span id="cart-count">0</span>)
-            </button>
+            <button onclick="openHistoryModal()" class="bg-gray-100 text-indigo-600 px-3 py-1.5 rounded-full text-sm font-medium border border-indigo-200">📦 ប្រវត្តិ</button>
+            <button onclick="toggleCart()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">🛒 កន្ត្រក (<span id="cart-count">0</span>)</button>
         </div>
     </header>
 
-    <!-- Product Grid -->
     <main class="p-4 max-w-md mx-auto">
         <h2 class="text-lg font-semibold mb-3">ផលិតផលទាំងអស់</h2>
         <div id="product-grid" class="grid grid-cols-2 gap-4">
@@ -43,25 +37,22 @@
                 <img id="detail-img" src="" alt="Product" class="w-full h-56 object-cover rounded-xl mb-3 border">
                 <h3 id="detail-name" class="font-bold text-sm text-gray-800"></h3>
                 <p id="detail-price" class="text-indigo-600 font-bold text-base mt-1"></p>
+                <p id="detail-color-stock" class="text-xs text-gray-500 mt-1">ស្តុកពណ៌នេះ: <strong id="stock-val" class="text-green-600">0</strong></p>
             </div>
 
-            <!-- ជ្រើសរើសពណ៌ -->
             <div class="mt-4">
                 <label class="block text-xs font-semibold text-gray-600 mb-2">🎨 ជ្រើសរើសពណ៌:</label>
-                <div id="color-options" class="flex gap-2 flex-wrap">
-                    <!-- ពណ៌ដាំដោយ JS -->
-                </div>
+                <div id="color-options" class="flex gap-2 flex-wrap"></div>
             </div>
 
             <div class="mt-6">
-                <button onclick="addSelectedToCart()" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition">
+                <button id="add-to-cart-btn" onclick="addSelectedToCart()" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition">
                     បញ្ជូលទៅក្នុងកន្ត្រក 🛒
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Order History Modal -->
     <div id="history-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl">
             <div>
@@ -69,15 +60,12 @@
                     <h2 class="text-lg font-bold text-indigo-600">📦 ប្រវត្តិការបញ្ជាទិញ</h2>
                     <button onclick="closeHistoryModal()" class="text-gray-500 font-bold text-xl">&times;</button>
                 </div>
-                <div id="history-items" class="py-3 space-y-3 overflow-y-auto max-h-[75vh]">
-                    <p class="text-xs text-gray-400 text-center py-4">កំពុងទាញយក...</p>
-                </div>
+                <div id="history-items" class="py-3 space-y-3 overflow-y-auto max-h-[75vh]"></div>
             </div>
-            <button onclick="closeHistoryModal()" class="w-full bg-gray-200 text-gray-700 py-2 rounded font-semibold text-xs mt-3">បិទ</button>
+            <button onclick="closeHistoryModal()" class="w-full bg-gray-200 text-gray-700 py-2 rounded font-semibold text-xs">បិទ</button>
         </div>
     </div>
 
-    <!-- QR Code Payment Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-xs p-5 rounded-xl shadow-2xl text-center flex flex-col items-center">
             <h3 class="text-base font-bold text-indigo-600 mb-1">ស្កេនបង់ប្រាក់ qua ABA KHQR</h3>
@@ -89,14 +77,11 @@
 
             <p class="text-xs font-semibold mb-2">ទឹកប្រាក់សរុប: <span id="qr-amount" class="text-indigo-600 font-bold text-sm"></span></p>
 
-            <button onclick="confirmPayment()" id="confirm-pay-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold text-xs hover:bg-green-700 mb-2">
-                បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)
-            </button>
+            <button onclick="confirmPayment()" id="confirm-pay-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold text-xs mb-2">បានបង់ប្រាក់រួចរាល់</button>
             <button onclick="closeQrModal()" class="w-full bg-gray-200 text-gray-700 py-1.5 rounded-lg font-semibold text-xs">បោះបង់</button>
         </div>
     </div>
 
-    <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex justify-end">
         <div class="bg-white w-full max-w-sm h-full p-4 flex flex-col justify-between shadow-xl overflow-y-auto">
             <div>
@@ -109,28 +94,26 @@
 
                 <div class="mt-3 space-y-2">
                     <h3 class="font-bold text-xs text-indigo-600">ព័ត៌មានអ្នកទទួល</h3>
-                    <input type="text" id="cus-name" placeholder="ឈ្មោះអ្នកទទួល (Full Name)" class="w-full border rounded px-3 py-1.5 text-xs">
-                    <input type="text" id="cus-phone" placeholder="លេខទូរសព្ទ (Phone Number)" class="w-full border rounded px-3 py-1.5 text-xs">
-                    <textarea id="cus-address" rows="2" placeholder="ទីតាំងអ្នកទទួល (Address)" class="w-full border rounded px-3 py-1.5 text-xs"></textarea>
+                    <input type="text" id="cus-name" placeholder="ឈ្មោះអ្នកទទួល" class="w-full border rounded px-3 py-1.5 text-xs">
+                    <input type="text" id="cus-phone" placeholder="លេខទូរសព្ទ" class="w-full border rounded px-3 py-1.5 text-xs">
+                    <textarea id="cus-address" rows="2" placeholder="ទីតាំងអ្នកទទួល" class="w-full border rounded px-3 py-1.5 text-xs"></textarea>
                     
                     <label class="block text-[11px] font-semibold text-gray-600 mt-1">សេវាដឹកជញ្ជូន:</label>
                     <select id="shipping-option" onchange="updateCartUI()" class="w-full border rounded px-3 py-1.5 text-xs bg-white">
                         <option value="2.00">metfone express (+ $2.00)</option>
                         <option value="2.00">J&T Express (+ $2.00)</option>
                         <option value="2.00">វីរៈប៊ុនថាំ VET (+ $2.00)</option>
-                        <option value="0.00">ក្រុងប៉ោយប៉ែត FREE (ឥតគិតថ្លៃ $0.00)</option>
+                        <option value="0.00">ក្រុងប៉ោយប៉ែត FREE ($0.00)</option>
                     </select>
                 </div>
             </div>
 
             <div class="border-t pt-2 mt-3">
                 <div class="flex justify-between font-bold text-xs mb-2">
-                    <span>សរុបទឹកប្រាក់សរុប:</span>
+                    <span>សរុបទឹកប្រាក់:</span>
                     <span id="total-price" class="text-indigo-600">$0.00</span>
                 </div>
-                <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs hover:bg-green-700">
-                    បង់ប្រាក់តាម ABA KHQR
-                </button>
+                <button onclick="startCheckoutProcess()" id="checkout-btn" class="w-full bg-green-600 text-white py-2 rounded font-semibold text-xs">បង់ប្រាក់តាម ABA KHQR</button>
             </div>
         </div>
     </div>
@@ -138,23 +121,20 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
         let telegramId = tg.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : 'test_user_vandy';
 
         let currentTranId = null;
         let products = [];
         let cart = [];
         let selectedProductForDetail = null;
-        let selectedColorName = '';
+        let selectedColorObj = null;
 
         async function fetchProducts() {
             try {
-                let response = await fetch('https://fafa-backend.onrender.com/api/products');
-                products = await response.json();
+                let res = await fetch('https://fafa-backend.onrender.com/api/products');
+                products = await res.json();
                 renderProducts();
-            } catch (err) {
-                console.error("Error fetching products:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         function renderProducts() {
@@ -165,17 +145,14 @@
                         <h3 class="text-xs font-medium">${p.name}</h3>
                         <p class="text-indigo-600 font-bold text-xs mt-1">$${p.price.toFixed(2)}</p>
                         <div class="text-[10px] mt-1 mb-1">
-                            ${p.stock > 0 ? `<span class="text-gray-500">ស្តុក: <strong class="text-green-600">${p.stock}</strong></span>` : `<span class="text-red-500 font-bold">អស់ស្តុក</span>`}
+                            ${p.stock > 0 ? `<span class="text-gray-500">ស្តុកសរុប: <strong class="text-green-600">${p.stock}</strong></span>` : `<span class="text-red-500 font-bold">អស់ស្តុក</span>`}
                         </div>
-                        <span class="text-center py-1 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-600">
-                            ជ្រើសរើសពណ៌ / មើលលម្អិត
-                        </span>
+                        <span class="text-center py-1 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-600">ជ្រើសរើសពណ៌</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // បើកផ្ទាំងលម្អិតដើម្បីជ្រើសរើសពណ៌
         function openProductDetail(id) {
             let p = products.find(item => item.id === id);
             if (!p) return;
@@ -187,24 +164,50 @@
 
             let colorsContainer = document.getElementById('color-options');
             if (p.colors && p.colors.length > 0) {
-                selectedColorName = p.colors[0].colorName;
+                selectedColorObj = p.colors[0];
+                document.getElementById('stock-val').innerText = selectedColorObj.stock || 0;
+                
                 colorsContainer.innerHTML = p.colors.map((c, index) => `
-                    <button onclick="selectColor('${c.image}', '${c.colorName}')" class="border-2 p-1 rounded-xl flex items-center gap-1.5 text-xs hover:border-indigo-600 transition ${index === 0 ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'}">
+                    <button onclick="selectColor('${c.image}', '${c.colorName}', ${c.stock || 0}, this)" class="color-btn border-2 p-1.5 rounded-xl flex items-center gap-1.5 text-xs transition ${index === 0 ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'}">
                         <img src="${c.image}" class="w-8 h-8 object-cover rounded-lg">
-                        <span class="px-1 font-medium">${c.colorName}</span>
+                        <div class="text-left">
+                            <p class="font-medium">${c.colorName}</p>
+                            <p class="text-[10px] ${c.stock > 0 ? 'text-green-600' : 'text-red-500'}">ស្តុក: ${c.stock || 0}</p>
+                        </div>
                     </button>
                 `).join('');
             } else {
-                selectedColorName = 'ស្តង់ដារ';
+                selectedColorObj = { colorName: 'ស្តង់ដារ', stock: p.stock };
+                document.getElementById('stock-val').innerText = p.stock;
                 colorsContainer.innerHTML = `<span class="text-xs text-gray-500">គ្មានជម្រើសពណ៌ផ្សេងទេ</span>`;
             }
 
+            checkStockAndToggleButton();
             document.getElementById('product-detail-modal').classList.remove('hidden');
         }
 
-        function selectColor(imgUrl, colorName) {
+        function selectColor(imgUrl, colorName, colorStock, btnElement) {
             document.getElementById('detail-img').src = imgUrl;
-            selectedColorName = colorName;
+            selectedColorObj = { colorName, stock: colorStock };
+            document.getElementById('stock-val').innerText = colorStock;
+
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('border-indigo-600', 'bg-indigo-50'));
+            btnElement.classList.add('border-indigo-600', 'bg-indigo-50');
+
+            checkStockAndToggleButton();
+        }
+
+        function checkStockAndToggleButton() {
+            let btn = document.getElementById('add-to-cart-btn');
+            if (selectedColorObj.stock <= 0) {
+                btn.innerText = "អស់ស្តុកហើយ ❌";
+                btn.disabled = true;
+                btn.className = "w-full bg-gray-300 text-gray-500 py-2.5 rounded-xl font-semibold text-xs cursor-not-allowed";
+            } else {
+                btn.innerText = "បញ្ជូលទៅក្នុងកន្ត្រក 🛒";
+                btn.disabled = false;
+                btn.className = "w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition";
+            }
         }
 
         function closeDetailModal() {
@@ -212,25 +215,31 @@
         }
 
         function addSelectedToCart() {
-            if (!selectedProductForDetail) return;
+            if (!selectedProductForDetail || !selectedColorObj) return;
             let p = selectedProductForDetail;
-            if (p.stock <= 0) { alert('អស់ស្តុកហើយ!'); return; }
 
-            // ឆែកមើលថាតើមានក្នុងកន្ត្រកហើយឬនៅ (ផ្អែកលើ ID និង ពណ៌)
-            let exist = cart.find(item => item.id === p.id && item.selectedColor === selectedColorName);
+            if (selectedColorObj.stock <= 0) {
+                alert('⚠️ ពណ៌នេះអស់ស្តុកហើយ!');
+                return;
+            }
+
+            let exist = cart.find(item => item.id === p.id && item.selectedColor === selectedColorObj.colorName);
+            let currentInCart = exist ? exist.quantity : 0;
+
+            if (currentInCart >= selectedColorObj.stock) {
+                alert(`⚠️ លើសចំនួនស្តុកที่มีសម្រាប់ពណ៌ ${selectedColorObj.colorName} នេះហើយ!`);
+                return;
+            }
+
             if (exist) {
-                if (exist.quantity >= p.stock) {
-                    alert('⚠️ លើសចំនួនស្តុកដែលមាន!');
-                    return;
-                }
                 exist.quantity++;
             } else {
-                cart.push({ ...p, quantity: 1, selectedColor: selectedColorName });
+                cart.push({ ...p, quantity: 1, selectedColor: selectedColorObj.colorName });
             }
 
             closeDetailModal();
             updateCartUI();
-            alert(`បានបន្ថែម ${p.name} (ពណ៌: ${selectedColorName}) ចូលកន្ត្រកជោគជ័យ!`);
+            alert(`បានបន្ថែម ${p.name} (ពណ៌: ${selectedColorObj.colorName}) ចូលកន្ត្រកជោគជ័យ!`);
         }
 
         function updateCartUI() {
@@ -269,122 +278,83 @@
         async function openHistoryModal() {
             document.getElementById('history-modal').classList.remove('hidden');
             let container = document.getElementById('history-items');
-            container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">កំពុងទាញយកប្រវត្តិពី Server...</p>';
+            container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">កំពុងទាញយក...</p>';
 
             try {
-                let response = await fetch(`https://fafa-backend.onrender.com/api/orders/${telegramId}`);
-                let serverOrders = await response.json();
-
-                if (!serverOrders || serverOrders.length === 0) {
-                    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">មិនទាន់មានប្រវត្តិការបញ្ជាទិញនៅឡើយទេ</p>';
+                let res = await fetch(`https://fafa-backend.onrender.com/api/orders/${telegramId}`);
+                let orders = await res.json();
+                if (orders.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">មិនទាន់មានប្រវត្តិទិញទេ</p>';
                     return;
                 }
-
-                container.innerHTML = serverOrders.map(o => `
+                container.innerHTML = orders.map(o => `
                     <div class="bg-gray-50 p-3 rounded-lg border text-xs space-y-1">
                         <div class="flex justify-between font-bold text-indigo-600">
                             <span>កូដ: ${o.orderId}</span>
-                            ${o.status === 'PAID' ? '<span class="text-green-600">✅ បានអនុម័តជោគជ័យ</span>' : 
-                              o.status === 'REJECTED' ? '<span class="text-red-500">❌ ការទូទាត់បរាជ័យ</span>' : 
-                              '<span class="text-yellow-600">⏳ រង់ចាំ Admin ពិនិត្យ</span>'}
+                            ${o.status === 'PAID' ? '<span class="text-green-600">✅ បានអនុម័ត</span>' : o.status === 'REJECTED' ? '<span class="text-red-500">❌ បដិសេធ</span>' : '<span class="text-yellow-600">⏳ រង់ចាំពិនិត្យ</span>'}
                         </div>
                         <p class="text-[11px] text-gray-500">ថ្ងៃទី: ${o.date}</p>
                         <div class="border-t pt-1 mt-1 space-y-1">
                             ${o.cart.map(i => `<p>• ${i.name} ${i.selectedColor ? `(ពណ៌: ${i.selectedColor})` : ''} ($${i.price} x ${i.quantity})</p>`).join('')}
                         </div>
-                        <div class="text-[11px] text-gray-600 pt-1">
-                            🚚 ${o.shippingName} <br>
-                            📍 ទីតាំង: ${o.address}
-                        </div>
                         <div class="border-t pt-1 mt-1 font-semibold flex justify-between">
-                            <span>សរុបទឹកប្រាក់:</span>
+                            <span>សរុบ:</span>
                             <span class="text-indigo-600">$${o.amount}</span>
                         </div>
                     </div>
                 `).join('');
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<p class="text-xs text-red-500 text-center py-4">បរាជ័យក្នុងការទាញយកប្រវត្តិទិញ</p>';
-            }
+            } catch (err) { console.error(err); }
         }
 
-        function closeHistoryModal() {
-            document.getElementById('history-modal').classList.add('hidden');
-        }
+        function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
 
         async function startCheckoutProcess() {
             if (cart.length === 0) { alert('សូមជ្រើសរើសទំនិញ!'); return; }
             let name = document.getElementById('cus-name').value.trim();
             let phone = document.getElementById('cus-phone').value.trim();
             let address = document.getElementById('cus-address').value.trim();
-            
             if (!name || !phone || !address) { alert('សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!'); return; }
 
             let subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            let shippingSelect = document.getElementById('shipping-option');
-            let shippingFee = parseFloat(shippingSelect.value) || 0;
-            let shippingName = shippingSelect.options[shippingSelect.selectedIndex].text;
+            let shippingFee = parseFloat(document.getElementById('shipping-option').value) || 0;
+            let shippingName = document.getElementById('shipping-option').selectedOptions[0].text;
             let totalAmount = (subtotal + shippingFee).toFixed(2);
             let orderId = 'FAFA-' + Date.now();
 
-            let btn = document.getElementById('checkout-btn');
-            btn.innerText = "កំពុងរៀបចំ QR...";
-            btn.disabled = true;
-
             try {
-                let response = await fetch('https://fafa-backend.onrender.com/api/create-order', {
+                let res = await fetch('https://fafa-backend.onrender.com/api/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ telegramId, orderId, amount: totalAmount, name, phone, address, shippingFee, shippingName, cart })
                 });
-                let result = await response.json();
+                let result = await res.json();
                 if (result.success) {
                     currentTranId = result.tran_id;
                     document.getElementById('qr-amount').innerText = `$${totalAmount}`;
                     document.getElementById('qr-modal').classList.remove('hidden');
                     toggleCart();
-                } else {
-                    alert('បរាជ័យក្នុងការបង្កើតការបញ្ជាទិញ!');
                 }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                btn.innerText = "បង់ប្រាក់តាម ABA KHQR";
-                btn.disabled = false;
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function confirmPayment() {
-            let btn = document.getElementById('confirm-pay-btn');
-            btn.innerText = "កំពុងបញ្ជូន...";
-            btn.disabled = true;
-
             try {
-                let response = await fetch('https://fafa-backend.onrender.com/api/confirm-payment', {
+                let res = await fetch('https://fafa-backend.onrender.com/api/confirm-payment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ tran_id: currentTranId })
                 });
-                let result = await response.json();
+                let result = await res.json();
                 if (result.success) {
                     cart = [];
-                    alert('🎉 បានបញ្ជូនការបញ្ជាទិញរួចរាល់! រង់ចាំ Admin ផ្ទៀងផ្ទាត់។');
+                    alert('🎉 បានបញ្ជូនការបញ្ជាទិញរួចរាល់! រង់ចាំ Admin ពិនិត្យ។');
                     document.getElementById('qr-modal').classList.add('hidden');
                     updateCartUI();
-                } else {
-                    alert('មានបញ្ហាបញ្ជាក់ការទូទាត់!');
                 }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                btn.innerText = "បានបង់ប្រាក់រួចរាល់ (បញ្ជាក់ការបញ្ជាទិញ)";
-                btn.disabled = false;
-            }
+            } catch (err) { console.error(err); }
         }
 
-        function closeQrModal() {
-            document.getElementById('qr-modal').classList.add('hidden');
-        }
+        function closeQrModal() { document.getElementById('qr-modal').classList.add('hidden'); }
 
         fetchProducts();
     </script>
