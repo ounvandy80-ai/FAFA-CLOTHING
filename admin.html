@@ -12,18 +12,16 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-    <!-- 🔐 ផ្ទាំង Login សម្រាប់ផ្ទៀងផ្ទាត់ -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
-            <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នកដើម្បីចូលកាន់ប្រព័ន្ធ</p>
+            <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក</p>
             <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
-            <p id="loginError" class="text-red-500 text-sm mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ! អ្នកមិនមានសិទ្ធិចូលទេ។</p>
+            <p id="loginError" class="text-red-500 text-sm mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!</p>
         </div>
     </div>
 
-    <!-- 🛠️ ផ្ទាំង Admin Panel -->
     <div id="adminContent" class="hidden">
         <header class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
             <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
@@ -32,7 +30,6 @@
 
         <main class="max-w-5xl mx-auto p-6">
             
-            <!-- 📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders) -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8 border-2 border-yellow-400">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ (Pending Orders)</h2>
                 <div class="overflow-x-auto">
@@ -43,7 +40,7 @@
                                 <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
                                 <th class="p-3">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
                                 <th class="p-3">ទឹកប្រាក់សរុប</th>
-                                <th class="p-3 text-center">សកម្មភាព (Approve / Reject)</th>
+                                <th class="p-3 text-center">សកម្មភាព</th>
                             </tr>
                         </thead>
                         <tbody id="pendingOrderList">
@@ -53,27 +50,27 @@
                 </div>
             </div>
 
-            <!-- បន្ថែមផលិតផលថ្មី (មានបញ្ចូលជម្រើសពណ៌) -->
+            <!-- បន្ថែមផលិតផលថ្មី និងស្តុកតាមពណ៌ -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី និងពណ៌ផ្សេងៗ</h2>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">➕ បន្ថែមផលិតផលថ្មី និងស្តុកតាមពណ៌</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="number" id="newId" placeholder="ID ផលិតផល (ឧទាហរណ៍: 9, 10...)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="newName" placeholder="ឈ្មោះផលិតផល (ឧ: អាវយឺត SNOOPY)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="number" id="newPrice" placeholder="តម្លៃ ($) ឧ: 3.75" step="0.01" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="number" id="newStock" placeholder="ចំនួនស្តុកសរុប (Stock)" class="border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="newImage" placeholder="លីងរូបភាពគោល (Main Image URL)" class="border p-2.5 rounded-lg col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" id="newId" placeholder="ID ផលិតផល (ឧ: 9, 10...)" class="border p-2.5 rounded-lg text-xs">
+                    <input type="text" id="newName" placeholder="ឈ្មោះផលិតផល" class="border p-2.5 rounded-lg text-xs">
+                    <input type="number" id="newPrice" placeholder="តម្លៃ ($)" step="0.01" class="border p-2.5 rounded-lg text-xs">
+                    <input type="number" id="newStock" placeholder="ស្តុកសរុប (Stock)" class="border p-2.5 rounded-lg text-xs">
+                    <input type="text" id="newImage" placeholder="លីងរូបភាពគោល (Main Image URL)" class="border p-2.5 rounded-lg col-span-1 md:col-span-2 text-xs">
                 </div>
 
-                <!-- 🎨 ផ្នែកបញ្ចូលពណ៌ផ្សេងៗ -->
                 <div class="mt-4 border-t pt-4">
                     <div class="flex justify-between items-center mb-2">
-                        <label class="font-bold text-sm text-gray-700">🎨 ជម្រើសពណ៌ផ្សេងៗ (Color Variants):</label>
-                        <button onclick="addColorRow()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold hover:bg-gray-300">+ បន្ថែមពណ៌ផ្សេងទៀត</button>
+                        <label class="font-bold text-sm text-gray-700">🎨 ជម្រើសពណ៌ និងស្តុកតាមពណ៌:</label>
+                        <button onclick="addColorRow()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold">+ បន្ថែមពណ៌ផ្សេងទៀត</button>
                     </div>
                     <div id="color-inputs-container" class="space-y-2">
                         <div class="flex gap-2 items-center color-row">
-                            <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ក្រហម)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
-                            <input type="text" placeholder="លីងរូបភាពពណ៌នេះ (Image URL)" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                            <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ខ្មៅ)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                            <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                            <input type="number" placeholder="ស្តុក (ឧ: 1)" class="color-stock-input border p-2 rounded-lg text-xs w-20">
                             <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
                         </div>
                     </div>
@@ -82,7 +79,6 @@
                 <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
-            <!-- គ្រប់គ្រងស្តុកផលិតផលដែលមានស្រាប់ -->
             <div class="bg-white p-6 rounded-xl shadow-md">
                 <h2 class="text-lg font-bold text-gray-700 mb-4">📦 គ្រប់គ្រងស្តុកផលិតផលស្រាប់</h2>
                 <div class="overflow-x-auto">
@@ -92,13 +88,11 @@
                                 <th class="p-3">រូបភាព</th>
                                 <th class="p-3">ឈ្មោះ</th>
                                 <th class="p-3">តម្លៃ</th>
-                                <th class="p-3">ស្តុកបច្ចុប្បន្ន</th>
+                                <th class="p-3">ស្តុកសរុប</th>
                                 <th class="p-3 text-center">សកម្មភាព</th>
                             </tr>
                         </thead>
-                        <tbody id="productList">
-                            <!-- ទិន្នន័យទាញមកបង្ហាញដោយ JavaScript -->
-                        </tbody>
+                        <tbody id="productList"></tbody>
                     </table>
                 </div>
             </div>
@@ -137,14 +131,14 @@
             location.reload();
         }
 
-        // បន្ថែមជួរដេកសម្រាប់បញ្ចូលពណ៌ថ្មី
         function addColorRow() {
             let container = document.getElementById('color-inputs-container');
             let div = document.createElement('div');
             div.className = "flex gap-2 items-center color-row";
             div.innerHTML = `
-                <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ស)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
-                <input type="text" placeholder="លីងរូបភាពពណ៌នេះ (Image URL)" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ពណ៌ផ្កាឈូក)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
+                <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
+                <input type="number" placeholder="ស្តុក (ឧ: 1)" class="color-stock-input border p-2 rounded-lg text-xs w-20">
                 <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
             `;
             container.appendChild(div);
@@ -157,7 +151,7 @@
                 let listHtml = '';
 
                 if (orders.length === 0) {
-                    listHtml = `<tr><td colspan="5" class="p-4 text-center text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំផ្ទៀងផ្ទាត់ទេ</td></tr>`;
+                    listHtml = `<tr><td colspan="5" class="p-4 text-center text-gray-500">គ្មានការបញ្ជាទិញរង់ចាំទេ</td></tr>`;
                 } else {
                     orders.forEach(o => {
                         let cartDetails = o.cart.map(item => `${item.name} ${item.selectedColor ? `(ពណ៌: ${item.selectedColor})` : ''} (x${item.quantity})`).join(', ');
@@ -168,8 +162,8 @@
                                 <td class="p-3 text-sm text-gray-600">${cartDetails}</td>
                                 <td class="p-3 font-bold text-green-600">$${o.amount}</td>
                                 <td class="p-3 text-center space-x-2">
-                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700 transition">Approve (យល់ព្រម)</button>
-                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-3 py-1.5 rounded text-sm hover:bg-red-600 transition">Reject (បដិសេធ)</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-3 py-1.5 rounded text-xs">Approve</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-3 py-1.5 rounded text-xs">Reject</button>
                                 </td>
                             </tr>
                         `;
@@ -177,14 +171,12 @@
                 }
                 document.getElementById('pendingOrderList').innerHTML = listHtml;
             } catch (err) {
-                console.error("Error loading pending orders:", err);
+                console.error(err);
             }
         }
 
         async function handleOrderAction(orderId, action) {
-            let confirmMsg = action === 'APPROVE' ? 'តើអ្នកពិតជាចង់ Approve និងផ្ញើសារចូល Telegram មែនទេ?' : 'តើអ្នកពិតជាចង់ Reject ការបញ្ជាទិញនេះមែនទេ?';
-            if (!confirm(confirmMsg)) return;
-
+            if (!confirm(`តើអ្នកចង់ ${action} ការបញ្ជាទិញនេះមែនទេ?`)) return;
             try {
                 let res = await fetch(`${BACKEND_URL}/api/admin/order-action`, {
                     method: 'POST',
@@ -200,7 +192,7 @@
                     alert('បរាជ័យ: ' + data.message);
                 }
             } catch (err) {
-                console.error("Error updating order action:", err);
+                console.error(err);
             }
         }
 
@@ -209,7 +201,6 @@
                 let res = await fetch(`${BACKEND_URL}/api/products`);
                 let products = await res.json();
                 let listHtml = '';
-
                 products.forEach(p => {
                     listHtml += `
                         <tr class="border-b hover:bg-gray-50">
@@ -220,15 +211,15 @@
                                 <input type="number" id="stock-${p.id}" value="${p.stock}" class="w-20 border p-1.5 rounded text-center">
                             </td>
                             <td class="p-3 text-center space-x-2">
-                                <button onclick="updateStock(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 transition">កែស្តុក</button>
-                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition">លុប</button>
+                                <button onclick="updateStock(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs">កែស្តុក</button>
+                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs">លុប</button>
                             </td>
                         </tr>
                     `;
                 });
                 document.getElementById('productList').innerHTML = listHtml;
             } catch (err) {
-                console.error("Error loading products:", err);
+                console.error(err);
             }
         }
 
@@ -240,15 +231,10 @@
                 body: JSON.stringify({ id: Number(id), stock: Number(newStock) })
             });
             let data = await res.json();
-            if (data.success) {
-                alert('កែស្តុកបានជោគជ័យ!');
-                loadProducts();
-            } else {
-                alert('បរាជ័យ: ' + data.message);
-            }
+            if (data.success) { alert('កែស្តុកបានជោគជ័យ!'); loadProducts(); }
+            else { alert('បរាជ័យ: ' + data.message); }
         }
 
-        // មុខងារបន្ថែមផលិតផលថ្មីជាមួយពណ៌
         async function addProduct() {
             let id = document.getElementById('newId').value;
             let name = document.getElementById('newName').value;
@@ -261,14 +247,13 @@
                 return;
             }
 
-            // ប្រមូលយកតម្លៃពណ៌និងរូបភាពពី Input Rows
             let colors = [];
-            let colorRows = document.querySelectorAll('.color-row');
-            colorRows.forEach(row => {
+            document.querySelectorAll('.color-row').forEach(row => {
                 let colorName = row.querySelector('.color-name-input').value.trim();
                 let colorImg = row.querySelector('.color-img-input').value.trim();
+                let colorStock = Number(row.querySelector('.color-stock-input').value) || 0;
                 if (colorName && colorImg) {
-                    colors.push({ colorName, image: colorImg });
+                    colors.push({ colorName, image: colorImg, stock: colorStock });
                 }
             });
 
@@ -287,17 +272,10 @@
         }
 
         async function deleteProduct(id) {
-            if (!confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) return;
-            let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, {
-                method: 'DELETE'
-            });
+            if (!confirm('តើអ្នកពិតជាចង់លុបមែនទេ?')) return;
+            let res = await fetch(`${BACKEND_URL}/api/admin/delete-product/${id}`, { method: 'DELETE' });
             let data = await res.json();
-            if (data.success) {
-                alert('លុបបានជោគជ័យ!');
-                loadProducts();
-            } else {
-                alert('បរាជ័យ: ' + data.message);
-            }
+            if (data.success) { alert('លុបបានជោគជ័យ!'); loadProducts(); }
         }
     </script>
 </body>
