@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAFA Clothing - Admin Panel</title>
+    <title>FAFA Clothing - Ultimate Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,8 +17,8 @@
         <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
             <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក</p>
-            <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">ចូលកាន់ប្រព័ន្ធ</button>
+            <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 text-xs">
+            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-semibold">ចូលកាន់ប្រព័ន្ធ</button>
             <p id="loginError" class="text-red-500 text-xs mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!</p>
         </div>
     </div>
@@ -27,19 +27,22 @@
     <div id="adminContent" class="hidden">
         <header class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
             <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
-            <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs hover:bg-red-600 transition">ចាកចេញ (Logout)</button>
+            <div class="flex items-center gap-4">
+                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">🟢 Online ឥឡូវនេះ: <span id="online-count">0</span> នាក់</span>
+                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs">ចាកចេញ</button>
+            </div>
         </header>
 
         <main class="max-w-5xl mx-auto p-6 space-y-8">
             
             <!-- Pending Orders -->
             <div class="bg-white p-6 rounded-xl shadow-md border-2 border-yellow-400">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ</h2>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">📋 បញ្ជីរង់ចាំការផ្ទៀងផ្ទាត់ការបញ្ជាទិញ និងទីតាំង GPS</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-yellow-50 text-gray-700 border-b text-xs">
-                                <th class="p-3">កូដបញ្ជាទិញ</th>
+                                <th class="p-3">កូដ & ទីតាំង</th>
                                 <th class="p-3">ឈ្មោះ & លេខទូរសព្ទ</th>
                                 <th class="p-3">ទំនិញកុម្ម៉ង់ & ពណ៌</th>
                                 <th class="p-3">ទឹកប្រាក់សរុប</th>
@@ -50,6 +53,27 @@
                             <tr><td colspan="5" class="p-4 text-center text-xs text-gray-500">កំពុងទាញយក...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- 🔍 ឆែកប្រវត្តិ User តាមលេខទូរសព្ទ និងគ្រប់គ្រង Block -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-base font-bold text-gray-700 mb-3">🔍 ឆែកប្រវត្តិទិញតាមលេខទូរសព្ទ</h2>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="search-phone-input" placeholder="វាយលេខទូរសព្ទ..." class="border p-2 rounded text-xs flex-1">
+                        <button onclick="searchUserByPhone()" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-semibold">ស្វែងរក</button>
+                    </div>
+                    <div id="search-result-container" class="space-y-2 max-h-48 overflow-y-auto text-xs text-gray-600">
+                        <p class="text-gray-400">មិនទាន់មានការស្វែងរក...</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-base font-bold text-gray-700 mb-3">👥 គ្រប់គ្រងអតិថិជន (Block / Unblock)</h2>
+                    <div id="users-list-container" class="space-y-2 max-h-48 overflow-y-auto text-xs">
+                        <p class="text-gray-400">កំពុងទាញយកអតិថិជន...</p>
+                    </div>
                 </div>
             </div>
 
@@ -78,7 +102,6 @@
                         </div>
                     </div>
                 </div>
-
                 <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold text-xs hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
@@ -131,7 +154,6 @@
                     <input type="text" id="edit-image" class="w-full border p-2 rounded-lg mt-1">
                 </div>
 
-                <!-- កែប្រែពណ៌ និងស្តុកតាមពណ៌ -->
                 <div class="border-t pt-3 mt-3">
                     <div class="flex justify-between items-center mb-2">
                         <label class="font-bold text-gray-700">🎨 កែប្រែពណ៌ និងស្តុកតាមពណ៌:</label>
@@ -158,8 +180,10 @@
             if (loggedUser === OWNER_EMAIL) {
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
-                loadProducts();
                 loadPendingOrders();
+                loadProducts();
+                loadAdminData();
+                setInterval(loadAdminData, 10000);
             }
         }
 
@@ -167,19 +191,11 @@
             let inputEmail = document.getElementById('adminEmailInput').value.trim();
             if (inputEmail === OWNER_EMAIL) {
                 localStorage.setItem('admin_email', OWNER_EMAIL);
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                loadProducts();
-                loadPendingOrders();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
+                location.reload();
+            } else { document.getElementById('loginError').style.display = 'block'; }
         }
 
-        function logoutAdmin() {
-            localStorage.removeItem('admin_email');
-            location.reload();
-        }
+        function logoutAdmin() { localStorage.removeItem('admin_email'); location.reload(); }
 
         function addColorRow() {
             let container = document.getElementById('color-inputs-container');
@@ -194,6 +210,57 @@
             container.appendChild(div);
         }
 
+        async function loadAdminData() {
+            try {
+                let res = await fetch(`${BACKEND_URL}/api/admin/users`);
+                let data = await res.json();
+                if (data.success) {
+                    document.getElementById('online-count').innerText = data.onlineCount;
+                    let userHtml = data.users.map(u => `
+                        <div class="flex justify-between items-center bg-gray-50 p-2 rounded">
+                            <div>
+                                <p class="font-bold">${u.name || 'Guest'} (${u.phone || 'គ្មានលេខទូរសព្ទ'})</p>
+                                <p class="text-[10px] text-gray-400">ID: ${u.telegramId}</p>
+                            </div>
+                            <button onclick="toggleBlockUser('${u.telegramId}')" class="px-3 py-1 rounded text-[11px] font-semibold ${u.isBlocked ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}">
+                                ${u.isBlocked ? 'Blocked (Unblock)' : 'Active (Block)'}
+                            </button>
+                        </div>
+                    `).join('');
+                    document.getElementById('users-list-container').innerHTML = userHtml || '<p class="text-gray-400">គ្មានទិន្នន័យ User</p>';
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function toggleBlockUser(telegramId) {
+            let res = await fetch(`${BACKEND_URL}/api/admin/toggle-block`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegramId })
+            });
+            let data = await res.json();
+            if (data.success) { alert(data.message); loadAdminData(); }
+        }
+
+        async function searchUserByPhone() {
+            let phone = document.getElementById('search-phone-input').value.trim();
+            if (!phone) return;
+            let res = await fetch(`${BACKEND_URL}/api/admin/search-user?phone=${phone}`);
+            let orders = await res.json();
+            let container = document.getElementById('search-result-container');
+            if (orders.length === 0) {
+                container.innerHTML = '<p class="text-gray-400">រកមិនឃើញប្រវត្តិទិញសម្រាប់លេខនេះទេ</p>';
+                return;
+            }
+            container.innerHTML = orders.map(o => `
+                <div class="bg-indigo-50 p-2 rounded border">
+                    <p class="font-bold text-indigo-600">កូដ: ${o.orderId} (${o.status})</p>
+                    <p>ថ្ងៃទី: ${o.date} | សរុប: $${o.amount}</p>
+                    <p class="text-gray-500">ទំនិញ: ${o.cart.map(i => `${i.name} ${i.selectedColor ? `(${i.selectedColor})` : ''}`).join(', ')}</p>
+                </div>
+            `).join('');
+        }
+
         async function loadPendingOrders() {
             try {
                 let res = await fetch(`${BACKEND_URL}/api/admin/pending-orders`);
@@ -204,9 +271,10 @@
                 } else {
                     orders.forEach(o => {
                         let cartDetails = o.cart.map(item => `${item.name} ${item.selectedColor ? `(ពណ៌: ${item.selectedColor})` : ''} (x${item.quantity})`).join(', ');
+                        let locationBtn = o.location ? `<a href="https://maps.google.com/?q=${o.location.lat},${o.location.lng}" target="_blank" class="text-blue-600 underline font-semibold">📍 មើលទីតាំង GPS</a>` : 'គ្មានទីតាំង';
                         listHtml += `
                             <tr class="border-b hover:bg-gray-50 text-xs">
-                                <td class="p-3 font-semibold text-indigo-600">${o.orderId}</td>
+                                <td class="p-3 font-semibold text-indigo-600">${o.orderId}<br>${locationBtn}</td>
                                 <td class="p-3 text-gray-800">${o.name || 'គ្មានឈ្មោះ'}<br><span class="text-gray-500">${o.phone}</span></td>
                                 <td class="p-3 text-gray-600">${cartDetails}</td>
                                 <td class="p-3 font-bold text-green-600">$${o.amount}</td>
@@ -224,16 +292,14 @@
 
         async function handleOrderAction(orderId, action) {
             if (!confirm(`តើអ្នកចង់ ${action} ការបញ្ជាទិញនេះមែនទេ?`)) return;
-            try {
-                let res = await fetch(`${BACKEND_URL}/api/admin/order-action`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId, action })
-                });
-                let data = await res.json();
-                if (data.success) { alert(data.message); loadPendingOrders(); loadProducts(); }
-                else { alert('បរាជ័យ: ' + data.message); }
-            } catch (err) { console.error(err); }
+            let res = await fetch(`${BACKEND_URL}/api/admin/order-action`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, action })
+            });
+            let data = await res.json();
+            if (data.success) { alert(data.message); loadPendingOrders(); loadProducts(); }
+            else { alert('បរាជ័យ: ' + data.message); }
         }
 
         async function loadProducts() {
@@ -259,7 +325,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // បើកផ្ទាំង Modal កែប្រែទំនិញ
         function openEditModal(id) {
             let p = allProducts.find(item => item.id === id);
             if (!p) return;
@@ -294,11 +359,8 @@
             container.appendChild(div);
         }
 
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
 
-        // រក្សាទុកការកែប្រែពី Modal
         async function saveProductChanges() {
             let id = Number(document.getElementById('edit-id').value);
             let name = document.getElementById('edit-name').value.trim();
@@ -327,9 +389,7 @@
                     alert('🎉 កែប្រែបានជោគជ័យ!');
                     closeEditModal();
                     loadProducts();
-                } else {
-                    alert('បរាជ័យ: ' + data.message);
-                }
+                } else { alert('បរាជ័យ: ' + data.message); }
             } catch (err) { console.error(err); }
         }
 
