@@ -18,7 +18,7 @@
             <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Admin Login</h2>
             <p class="text-gray-500 text-sm mb-6">សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក</p>
             <input type="password" id="adminEmailInput" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-4 text-xs">
-            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-semibold">ចូលកាន់ប្រព័ន្ធ</button>
+            <button onclick="checkAdminLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-semibold cursor-pointer">ចូលកាន់ប្រព័ន្ធ</button>
             <p id="loginError" class="text-red-500 text-xs mt-3 hidden">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!</p>
         </div>
     </div>
@@ -29,7 +29,7 @@
             <h1 class="text-xl font-bold">🛠️ FAFA Clothing - Admin Panel</h1>
             <div class="flex items-center gap-4">
                 <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">🟢 Online ឥឡូវនេះ: <span id="online-count">0</span> នាក់</span>
-                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs">ចាកចេញ</button>
+                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs cursor-pointer">ចាកចេញ</button>
             </div>
         </header>
 
@@ -62,7 +62,7 @@
                     <h2 class="text-base font-bold text-gray-700 mb-3">🔍 ឆែកប្រវត្តិទិញតាមលេខទូរសព្ទ</h2>
                     <div class="flex gap-2 mb-4">
                         <input type="text" id="search-phone-input" placeholder="វាយលេខទូរសព្ទ..." class="border p-2 rounded text-xs flex-1">
-                        <button onclick="searchUserByPhone()" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-semibold">ស្វែងរក</button>
+                        <button onclick="searchUserByPhone()" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-semibold cursor-pointer">ស្វែងរក</button>
                     </div>
                     <div id="search-result-container" class="space-y-2 max-h-48 overflow-y-auto text-xs text-gray-600">
                         <p class="text-gray-400">មិនទាន់មានការស្វែងរក...</p>
@@ -87,9 +87,9 @@
                     <!-- បញ្ជីឈ្មោះអ្នកឆាត -->
                     <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-r bg-gray-50 flex flex-col">
                         <div class="p-3 border-b bg-gray-100 flex gap-1">
-                            <button onclick="filterChats('all')" id="filter-all" class="flex-1 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white">ទាំងអស់</button>
-                            <button onclick="filterChats('facebook')" id="filter-facebook" class="flex-1 py-1 rounded text-[11px] font-bold bg-white text-blue-600 border">Facebook</button>
-                            <button onclick="filterChats('telegram')" id="filter-telegram" class="flex-1 py-1 rounded text-[11px] font-bold bg-white text-sky-600 border">Telegram</button>
+                            <button onclick="filterChats('all')" id="filter-all" class="flex-1 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer">ទាំងអស់</button>
+                            <button onclick="filterChats('facebook')" id="filter-facebook" class="flex-1 py-1 rounded text-[11px] font-bold bg-white text-blue-600 border cursor-pointer">Facebook</button>
+                            <button onclick="filterChats('telegram')" id="filter-telegram" class="flex-1 py-1 rounded text-[11px] font-bold bg-white text-sky-600 border cursor-pointer">Telegram</button>
                         </div>
                         <div id="chat-conversations-list" class="flex-1 overflow-y-auto divide-y">
                             <p class="p-4 text-center text-xs text-gray-400">កំពុងរង់ចាំសារពីអតិថិជន...</p>
@@ -106,7 +106,7 @@
                         </div>
                         <div class="p-3 border-t bg-white flex gap-2">
                             <input type="text" id="admin-chat-input" onkeypress="if(event.key === 'Enter') sendAdminChatMessage()" placeholder="វាយសារឆ្លើយតបទៅអតិថិជន..." class="flex-1 border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500" disabled>
-                            <button id="admin-chat-send-btn" onclick="sendAdminChatMessage()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50" disabled>បញ្ជូន</button>
+                            <button id="admin-chat-send-btn" onclick="sendAdminChatMessage()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50 cursor-pointer" disabled>បញ្ជូន</button>
                         </div>
                     </div>
                 </div>
@@ -126,18 +126,18 @@
                 <div class="mt-4 border-t pt-4">
                     <div class="flex justify-between items-center mb-2">
                         <label class="font-bold text-sm text-gray-700">🎨 ជម្រើសពណ៌ និងស្តុកតាមពណ៌:</label>
-                        <button onclick="addColorRow()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold">+ បន្ថែមពណ៌ផ្សេងទៀត</button>
+                        <button onclick="addColorRow()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-semibold cursor-pointer">+ បន្ថែមពណ៌ផ្សេងទៀត</button>
                     </div>
                     <div id="color-inputs-container" class="space-y-2">
                         <div class="flex gap-2 items-center color-row">
                             <input type="text" placeholder="ឈ្មោះពណ៌ (ឧ: ខ្មៅ)" class="color-name-input border p-2 rounded-lg text-xs flex-1">
                             <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
                             <input type="number" placeholder="ស្តុក" class="color-stock-input border p-2 rounded-lg text-xs w-20">
-                            <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
+                            <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs cursor-pointer">លុប</button>
                         </div>
                     </div>
                 </div>
-                <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold text-xs hover:bg-green-700 transition">រក្សាទុកផលិតផលថ្មី</button>
+                <button onclick="addProduct()" class="mt-6 w-full bg-green-600 text-white py-2.5 rounded-lg font-semibold text-xs hover:bg-green-700 transition cursor-pointer">រក្សាទុកផលិតផលថ្មី</button>
             </div>
 
             <!-- Manage Products -->
@@ -164,7 +164,7 @@
     <!-- 🛠️ ផ្ទាំង Modal សម្រាប់កែប្រែផលិតផល និងស្តុកតាមពណ៌ -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative my-8">
-            <button onclick="closeEditModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <button onclick="closeEditModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold cursor-pointer">&times;</button>
             <h3 class="text-lg font-bold text-indigo-600 mb-4">✏️ កែប្រែព័ត៌មានទំនិញ និងស្តុកតាមពណ៌</h3>
             
             <input type="hidden" id="edit-id">
@@ -192,15 +192,15 @@
                 <div class="border-t pt-3 mt-3">
                     <div class="flex justify-between items-center mb-2">
                         <label class="font-bold text-gray-700">🎨 កែប្រែពណ៌ និងស្តុកតាមពណ៌:</label>
-                        <button onclick="addEditColorRow('', '', 0)" class="bg-gray-200 text-gray-800 px-2.5 py-1 rounded text-[11px] font-semibold">+ បន្ថែមពណ៌</button>
+                        <button onclick="addEditColorRow('', '', 0)" class="bg-gray-200 text-gray-800 px-2.5 py-1 rounded text-[11px] font-semibold cursor-pointer">+ បន្ថែមពណ៌</button>
                     </div>
                     <div id="edit-colors-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
             <div class="mt-6 flex gap-2">
-                <button onclick="saveProductChanges()" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition">រក្សាទុកការកែប្រែ (Save)</button>
-                <button onclick="closeEditModal()" class="bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-semibold text-xs">បោះបង់</button>
+                <button onclick="saveProductChanges()" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-indigo-700 transition cursor-pointer">រក្សាទុកការកែប្រែ (Save)</button>
+                <button onclick="closeEditModal()" class="bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-semibold text-xs cursor-pointer">បោះបង់</button>
             </div>
         </div>
     </div>
@@ -212,7 +212,7 @@
 
         // អថេរសម្រាប់ Omnichannel Chat
         let chatConversations = [];
-        let activeChatUser = null; // { platform: 'facebook'|'telegram', userId: '...', name: '...' }
+        let activeChatUser = null; 
         let currentChatFilter = 'all';
 
         window.onload = function() {
@@ -225,7 +225,7 @@
                 loadAdminData();
                 loadChatConversations();
                 setInterval(loadAdminData, 10000);
-                setInterval(loadChatConversations, 3000); // ឆែកសារថ្មីរៀងរាល់ 3 វិនាទី
+                setInterval(loadChatConversations, 3000); 
             }
         }
 
@@ -245,9 +245,9 @@
             ['all', 'facebook', 'telegram'].forEach(p => {
                 let btn = document.getElementById(`filter-${p}`);
                 if (p === platform) {
-                    btn.className = "flex-1 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white";
+                    btn.className = "flex-1 py-1 rounded text-[11px] font-bold bg-indigo-600 text-white cursor-pointer";
                 } else {
-                    btn.className = `flex-1 py-1 rounded text-[11px] font-bold bg-white ${p === 'facebook' ? 'text-blue-600' : p === 'telegram' ? 'text-sky-600' : 'text-gray-700'} border`;
+                    btn.className = `flex-1 py-1 rounded text-[11px] font-bold bg-white ${p === 'facebook' ? 'text-blue-600' : p === 'telegram' ? 'text-sky-600' : 'text-gray-700'} border cursor-pointer`;
                 }
             });
             renderChatConversations();
@@ -387,7 +387,7 @@
                 <input type="text" placeholder="ឈ្មោះពណ៌" class="color-name-input border p-2 rounded-lg text-xs flex-1">
                 <input type="text" placeholder="លីងរូបភាពពណ៌នេះ" class="color-img-input border p-2 rounded-lg text-xs flex-2">
                 <input type="number" placeholder="ស្តុក" class="color-stock-input border p-2 rounded-lg text-xs w-20">
-                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs">លុប</button>
+                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2.5 py-2 rounded-lg text-xs cursor-pointer">លុប</button>
             `;
             container.appendChild(div);
         }
@@ -404,7 +404,7 @@
                                 <p class="font-bold">${u.name || 'Guest'} (${u.phone || 'គ្មានលេខទូរសព្ទ'})</p>
                                 <p class="text-[10px] text-gray-400">ID: ${u.telegramId}</p>
                             </div>
-                            <button onclick="toggleBlockUser('${u.telegramId}')" class="px-3 py-1 rounded text-[11px] font-semibold ${u.isBlocked ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}">
+                            <button onclick="toggleBlockUser('${u.telegramId}')" class="px-3 py-1 rounded text-[11px] font-semibold cursor-pointer ${u.isBlocked ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}">
                                 ${u.isBlocked ? 'Blocked (Unblock)' : 'Active (Block)'}
                             </button>
                         </div>
@@ -461,8 +461,8 @@
                                 <td class="p-3 text-gray-600">${cartDetails}</td>
                                 <td class="p-3 font-bold text-green-600">$${o.amount}</td>
                                 <td class="p-3 text-center space-x-1">
-                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-2.5 py-1 rounded text-xs">Approve</button>
-                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-2.5 py-1 rounded text-xs">Reject</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'APPROVE')" class="bg-green-600 text-white px-2.5 py-1 rounded text-xs cursor-pointer">Approve</button>
+                                    <button onclick="handleOrderAction('${o.orderId}', 'REJECT')" class="bg-red-500 text-white px-2.5 py-1 rounded text-xs cursor-pointer">Reject</button>
                                 </td>
                             </tr>
                         `;
@@ -497,8 +497,8 @@
                             <td class="p-3 text-blue-600 font-semibold">$${p.price}</td>
                             <td class="p-3 font-bold">${p.stock}</td>
                             <td class="p-3 text-center space-x-1">
-                                <button onclick="openEditModal(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">កែប្រែ (Edit)</button>
-                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">លុប</button>
+                                <button onclick="openEditModal(${p.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700 cursor-pointer">កែប្រែ (Edit)</button>
+                                <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 cursor-pointer">លុប</button>
                             </td>
                         </tr>
                     `;
@@ -536,7 +536,7 @@
                 <input type="text" value="${name}" placeholder="ឈ្មោះពណ៌" class="edit-color-name border p-1.5 rounded text-xs flex-1">
                 <input type="text" value="${img}" placeholder="លីងរូបភាពពណ៌" class="edit-color-img border p-1.5 rounded text-xs flex-2">
                 <input type="number" value="${stock}" placeholder="ស្តុក" class="edit-color-stock border p-1.5 rounded text-xs w-16 text-center">
-                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2 py-1.5 rounded text-xs">លុប</button>
+                <button onclick="this.parentElement.remove()" class="bg-red-100 text-red-600 px-2 py-1.5 rounded text-xs cursor-pointer">លុប</button>
             `;
             container.appendChild(div);
         }
